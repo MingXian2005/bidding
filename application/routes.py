@@ -6,6 +6,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
 import os
 from werkzeug.utils import secure_filename
+from sqlalchemy import asc
+
 
 @app.route('/')
 def index():
@@ -72,5 +74,5 @@ from application import app
 
 @app.route('/bidding', methods=['GET'])
 def bidding():
-    bids = Bid.query.all()
+    bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
     return render_template('bidding.html', bids=bids)
