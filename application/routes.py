@@ -103,3 +103,55 @@ def submit():
 def visitors():
     all_visitors = Visitor.query.all()
     return render_template('visitors.html', visitors=all_visitors)
+
+
+from datetime import timedelta
+
+# Dummy project and bidding data (for now)
+project = {
+    "title": "Alpha Construction Project",
+    "start_price": 10000.00,
+    "start_date": datetime(2025, 7, 1, 12, 0),  # adjust as needed
+    "duration_minutes": 60
+}
+
+bids = []  # In-memory storage for bids
+
+
+@app.route('/bidding', methods=['GET', 'POST'])
+@login_required
+def bidding():
+    now = datetime.utcnow()
+    end_time = project["start_date"] + timedelta(minutes=project["duration_minutes"])
+    time_left = end_time - now
+
+    if time_left.total_seconds() < 0:
+        time_left = timedelta(seconds=0)
+
+    # Handle bidding form submission
+    if request.method == 'POST':
+        try:
+            bid_price = float(request.form["bid_price"])
+            current_highest = max([b['price'] for b in bids], default=project['start_price'])
+
+            if bid_price > current_highest:
+                bids.append({
+                    "user": current_user.IdentificationKey,
+                    "price": bid_price,
+                    "time": now
+                })
+                flash(f"Bid of ${bid_price:.2f} submitted successfully!", "success")
+            else:
+                flash(f"Your bid must be higher than the current highest bid (${current_highest:.2f})", "danger")
+        except ValueError:
+            flash("Invalid bid amount.", "danger")
+
+    # Compute current highest bid
+    highest_bid = max([b["price"] for b in bids], default=project["start_price"])
+
+    return render_template(
+        "main.html",
+        project=project,
+        highest_bid=highest_bid,
+        time_left=int(time_left.total_seconds())
+    )
