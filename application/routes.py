@@ -70,19 +70,7 @@ def bid():
 from flask import render_template
 from application import app
 
-@app.route('/bidding')
+@app.route('/bidding', methods=['GET'])
 def bidding():
-    # For now, let's use some dummy bids
-    from datetime import datetime
-
-    class DummyUser:
-        IdentificationKey = "test_user"
-
-    class DummyBid:
-        amount = 123.45
-        timestamp = datetime.utcnow()
-        user = DummyUser()
-
-    bids = [DummyBid(), DummyBid()]
-
+    bids = Bid.query.all()
     return render_template('bidding.html', bids=bids)
