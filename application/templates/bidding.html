@@ -1,8 +1,11 @@
-{% extends "layout.html" %}
-{% block content %}
-<div class="container">
-    <h2>Bidding Rankings</h2>
-    <table class="table table-striped">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bidding Page</title>
+</head>
+<body>
+    <h1>Bidding Rankings</h1>
+    <table border="1" cellpadding="5" cellspacing="0">
         <thead>
             <tr>
                 <th>Rank</th>
@@ -19,9 +22,10 @@
                 <td>{{ bid.amount }}</td>
                 <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
             </tr>
+            {% else %}
+            <tr><td colspan="4">No bids found.</td></tr>
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{ url_for('bid') }}" class="btn btn-primary">Place a Bid</a>
-</div>
-{% endblock %}
+</body>
+</html>

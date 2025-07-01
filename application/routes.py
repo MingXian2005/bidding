@@ -50,25 +50,39 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 #     all_visitors = Visitor.query.all()
 #     return render_template('visitors.html', visitors=all_visitors)
 
-
-from datetime import timedelta
-
-
-
-@app.route('/bidding')
-@login_required
-def bidding():
-    bids = Bid.query.order_by(Bid.amount.desc()).all()
-    return render_template('bidding.html', bids=bids, title='Bidding Home')
+from datetime import datetime
 
 @app.route('/bid', methods=['GET', 'POST'])
 @login_required
 def bid():
     form = BidForm()
     if form.validate_on_submit():
-        bid = Bid(amount=form.amount.data, user=current_user)
-        db.session.add(bid)
+        new_bid = Bid(amount=form.amount.data, user=current_user)
+        db.session.add(new_bid)
         db.session.commit()
         flash('Your bid has been placed successfully!', 'success')
         return redirect(url_for('bidding'))
-    return render_template('bid.html', form=form, title='Place a Bid')
+    return render_template('bid.html', form=form)
+
+# import os
+# print("TEMPLATE DIR:", os.getcwd(), flush=True)
+
+from flask import render_template
+from application import app
+
+@app.route('/bidding')
+def bidding():
+    # For now, let's use some dummy bids
+    from datetime import datetime
+
+    class DummyUser:
+        IdentificationKey = "test_user"
+
+    class DummyBid:
+        amount = 123.45
+        timestamp = datetime.utcnow()
+        user = DummyUser()
+
+    bids = [DummyBid(), DummyBid()]
+
+    return render_template('bidding.html', bids=bids)

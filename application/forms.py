@@ -7,9 +7,11 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6, max=120)])
     submit = SubmitField('Register')
 
+
 class BidForm(FlaskForm):
-    amount = FloatField('Amount', validators=[InputRequired(), NumberRange(min=0.01)])
+    amount = FloatField('Bid Amount (S$)', validators=[InputRequired(), NumberRange(min=0.01)])
     submit = SubmitField('Place Bid')
+
 
 class LoginForm(FlaskForm):
     IdentificationKey = StringField("Identification Key",
