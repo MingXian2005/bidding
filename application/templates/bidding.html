@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h2>Bidding Rankings</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Identification Key</th>
+                <th>Bid Amount</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bid in bids %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ bid.user.IdentificationKey }}</td>
+                <td>{{ bid.amount }}</td>
+                <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{ url_for('bid') }}" class="btn btn-primary">Place a Bid</a>
+</div>
+{% endblock %}

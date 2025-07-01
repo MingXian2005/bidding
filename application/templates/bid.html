@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <h2>Place a Bid</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.amount.label(class="form-control-label") }}
+            {{ form.amount(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -18,7 +18,7 @@ login_manager.init_app(app)
 
 with app.app_context():
     db.init_app(app)
-    from .models import User, Visitor
+    from .models import User, Bid
     db.create_all()
     db.session.commit()
     print('Created Database!')

@@ -1,6 +1,7 @@
 from application import db, login_manager
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -17,17 +18,9 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-# Visitor model
-class Visitor(db.Model):
+class Bid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    full_name = db.Column(db.String(100), nullable=False)
-    contact_number = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
-    company = db.Column(db.String(100))
-    purpose = db.Column(db.Text)
-    host = db.Column(db.String(100))
-    visit_date = db.Column(db.String(20), nullable=False)  # Store as string (YYYY-MM-DD)
-    visit_time = db.Column(db.String(10))
-    id_type = db.Column(db.String(50))
-    id_number = db.Column(db.String(100))
-    document_filename = db.Column(db.String(200))
+    amount = db.Column(db.Float, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('bids', lazy=True))
