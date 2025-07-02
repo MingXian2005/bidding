@@ -14,7 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, async_mode='eventlet')
 
 with app.app_context():
     from .models import User, Bid
