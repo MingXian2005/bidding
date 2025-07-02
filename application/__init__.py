@@ -17,7 +17,7 @@ login_manager = LoginManager(app)
 socketio = SocketIO(app, async_mode='eventlet')
 
 with app.app_context():
-    from .models import User, Bid
+    from .models import User, Bid, Timer
     db.create_all()
     db.session.commit()
     print('Created Database!')

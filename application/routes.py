@@ -1,6 +1,6 @@
 from application import app, db, socketio
 from application.forms import LoginForm, RegistrationForm, BidForm
-from application.models import User, Bid
+from application.models import User, Bid, Timer
 from flask import render_template, request, flash, json, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
@@ -8,6 +8,7 @@ import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import asc
 from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 
 @app.route('/')
@@ -45,72 +46,77 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'application', 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-
-# Optional: show all visitors (for testing)
-# @app.route('/visitors')
-# @login_required
-# def visitors():
-#     all_visitors = Visitor.query.all()
-#     return render_template('visitors.html', visitors=all_visitors)
-
 @app.route('/bid', methods=['GET', 'POST'])
 @login_required
 def bid():
-    global auction_end_time
     form = BidForm()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(ZoneInfo("Asia/Singapore"))
 
-    # If auction hasn't started, show full duration and mark as not started
-    auction_started = auction_end_time is not None
-    if not auction_started:
-        time_left = AUCTION_DURATION
-        auction_over = False
-    else:
+    # Fetch latest timer
+    timer = Timer.query.order_by(Timer.id.desc()).first()
+    auction_started = timer is not None
+    auction_over = False
+    auction_end_time = None
+
+    if auction_started:
+        auction_end_time = timer.end_time
+        # Ensure timezone awareness
+        if auction_end_time and auction_end_time.tzinfo is None:
+            auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         time_left = int((auction_end_time - now).total_seconds())
         auction_over = time_left <= 0
+    else:
+        time_left = AUCTION_DURATION  # default if no timer exists
 
-    # Get the lowest bid (if any)
+    # Get current lowest bid
     lowest_bid = db.session.query(Bid).order_by(Bid.amount.asc()).first()
     lowest_bid_amount = lowest_bid.amount if lowest_bid else None
 
     if form.validate_on_submit() and not auction_over:
-        # Validate bid amount
-        if form.amount.data >= STARTING_PRICE:
+        bid_value = form.amount.data
+
+        if bid_value >= STARTING_PRICE:
             flash(f'Your bid must be LOWER than the starting price (S$ {STARTING_PRICE:.2f}).', 'danger')
-        elif lowest_bid_amount is not None and form.amount.data >= lowest_bid_amount:
+        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount:
             flash(f'Your bid must be LOWER than the current lowest bid (S$ {lowest_bid_amount:.2f}).', 'danger')
-        elif form.amount.data < 0.01:
+        elif bid_value < 0.01:
             flash('Your bid must be at least S$ 0.01.', 'danger')
         else:
             # Start auction on first bid
             if not auction_started:
                 auction_end_time = now + timedelta(seconds=AUCTION_DURATION)
-                auction_started = True
-                time_left = AUCTION_DURATION
+                timer = Timer(end_time=auction_end_time)
+                db.session.add(timer)
             else:
-                # Only add extension if time_left <= 2 minutes (120 seconds)
+                # Extend time if <= 2 minutes left
                 if time_left <= 120:
                     auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
-            new_bid = Bid(amount=form.amount.data, user=current_user)
+                    timer.end_time = auction_end_time
+
+            # Save bid
+            new_bid = Bid(amount=bid_value, user=current_user)
             db.session.add(new_bid)
             db.session.commit()
+
+            # Emit real-time update
             socketio.emit('new_bid', {
                 'IdentificationKey': new_bid.user.IdentificationKey,
                 'amount': new_bid.amount,
                 'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S')
             })
+
             flash('Your bid has been placed successfully!', 'success')
             return redirect(url_for('bidding'))
+
     elif form.is_submitted() and auction_over:
         flash('Bidding has ended. You cannot place a bid.', 'danger')
 
-    # Recalculate time_left for rendering
-    if not auction_started:
-        time_left = AUCTION_DURATION
-        auction_over = False
-    else:
-        time_left = int((auction_end_time - datetime.now(timezone.utc)).total_seconds())
+    # Final time_left (recalculate to reflect updated timer)
+    if auction_end_time:
+        time_left = int((auction_end_time - datetime.now(ZoneInfo("Asia/Singapore"))).total_seconds())
         auction_over = time_left <= 0
+    else:
+        time_left = AUCTION_DURATION
 
     return render_template(
         'bid.html',
@@ -121,6 +127,7 @@ def bid():
         AUCTION_DURATION=AUCTION_DURATION,
         starting_price=STARTING_PRICE
     )
+
 
 # import os
 # print("TEMPLATE DIR:", os.getcwd(), flush=True)

@@ -1,7 +1,9 @@
 from application import app, db
-from application.models import User
+from application.models import User, Timer
 from flask import render_template, request, flash, redirect, url_for
-from application.forms import RegistrationForm
+from application.forms import RegistrationForm, TimerForm
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 @app.route('/admin/register', methods=['GET', 'POST'])
 def admin_register():
@@ -28,25 +30,30 @@ def admin_register():
 @app.route('/admin/page', methods=['GET', 'POST'])
 def admin_page():
     form = TimerForm()
-    # if form.validate_on_submit():
-    #     duration = form.duration.data
-    #     end_time = datetime.utcnow() + timedelta(minutes=duration)
-    #     timer = Timer(end_time=end_time)
-    #     db.session.add(timer)
-    #     db.session.commit()
-    #     flash(f'Timer started for {duration} minutes.', 'success')
-    #     return redirect(url_for('admin_page'))
-    return render_template('admin_page.html', form=form, title="Admin Page")
-
-@app.route('/admin/page/start', methods=['GET', 'POST'])
-def start():
-    form = TimerForm()
+    timer = Timer.query.order_by(Timer.id.desc()).first()
     if form.validate_on_submit():
-        duration = form.duration.data
-        end_time = datetime.utcnow() + timedelta(minutes=duration)
+        duration = form.duration.data  # duration in minutes
+        end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+        # Remove old timers if you want only one active
+        Timer.query.delete()
+        db.session.commit()
         timer = Timer(end_time=end_time)
         db.session.add(timer)
         db.session.commit()
-        flash(f'Timer started for {duration} minutes.', 'success')
+        flash(f'Auction timer set for {duration} minutes.', 'success')
         return redirect(url_for('admin_page'))
-    return render_template('admin_page.html', form=form, title="Admin Page")
+    return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
+
+@app.route('/admin/page/start', methods=['POST'])
+def admin_start_auction():
+    # You can get duration from a form or use a default
+    duration = int(request.form.get('duration', 5))  # default 5 minutes if not provided
+    end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+    # Remove old timers
+    Timer.query.delete()
+    db.session.commit()
+    timer = Timer(end_time=end_time)
+    db.session.add(timer)
+    db.session.commit()
+    flash(f'Auction started for {duration} minutes.', 'success')
+    return redirect(url_for('admin_page'))

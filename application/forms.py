@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FloatField
+from wtforms import StringField, PasswordField, SubmitField, FloatField, IntegerField
 from wtforms.validators import InputRequired, Length, NumberRange
 
 class RegistrationForm(FlaskForm):
@@ -20,3 +20,8 @@ class LoginForm(FlaskForm):
             validators=[InputRequired()], render_kw={"placeholder": "Password"})
     
     submit = SubmitField('Login')
+
+
+class TimerForm(FlaskForm):
+    duration = IntegerField('Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
+    submit = SubmitField('Set Timer')
