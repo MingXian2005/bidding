@@ -155,6 +155,8 @@ from application import app
 @app.route('/bidding', methods=['GET'])
 def bidding():
     bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
+    timer = Timer.query.order_by(Timer.id.desc()).first()
+    auction_end_time = timer.end_time
     return render_template('bidding.html', bids=bids)
 
 # Set auction end time (example: 5 minutes from server start)
