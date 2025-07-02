@@ -1,7 +1,17 @@
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="flash">
+        {% for msg in messages %}
+          <p>{{ msg }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %} 
+
 {% block content %}
 <div class="container">
     <h2>Admin Page</h2>
-    <form method="POST" action="">
+    <form method="POST" action="/admin/page/start" nonvalidate >
         {{ form.hidden_tag() }}
         <div class="form-group">
             {{ form.duration.label(class="form-control-label") }}
