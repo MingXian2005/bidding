@@ -65,7 +65,13 @@ def bid():
         flash('The bidding period has ended. No more bids can be placed.', 'danger')
         return redirect(url_for('bidding'))
 
+    highest_bid = Bid.query.order_by(Bid.amount.desc()).first()
+
     if form.validate_on_submit():
+        if highest_bid and form.amount.data <= highest_bid.amount:
+            flash(f'Your bid must be higher than the current highest bid of {highest_bid.amount}', 'danger')
+            return render_template('bid.html', form=form, timer=timer)
+
         if timer:
             time_left = timer.end_time.astimezone(ZoneInfo("UTC")) - datetime.now(ZoneInfo("UTC"))
             if time_left < timedelta(minutes=20):
