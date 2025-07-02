@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os
 from flask_login import LoginManager
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'  # For flash messages
@@ -11,13 +12,11 @@ app.secret_key = 'your-secret-key'  # For flash messages
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///visitors.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy()
-login_manager = LoginManager()
-login_manager.init_app(app)
-
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+socketio = SocketIO(app)
 
 with app.app_context():
-    db.init_app(app)
     from .models import User, Bid
     db.create_all()
     db.session.commit()

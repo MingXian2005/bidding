@@ -2,6 +2,18 @@
 <html>
 <head>
     <title>Bidding Page</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on('new_bid', function(data) {
+            // Option 1: Reload the page (simple)
+            location.reload();
+
+            // Option 2: Or, update the table dynamically (advanced)
+            // You can fetch new bids via AJAX and update the table here
+        });
+    </script>
 </head>
 <body>
     <h1>Bidding Rankings</h1>

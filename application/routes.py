@@ -1,4 +1,4 @@
-from application import app, db
+from application import app, db, socketio
 from application.forms import LoginForm, RegistrationForm, BidForm
 from application.models import User, Bid
 from flask import render_template, request, flash, json, jsonify, redirect, url_for
@@ -62,6 +62,12 @@ def bid():
         new_bid = Bid(amount=form.amount.data, user=current_user)
         db.session.add(new_bid)
         db.session.commit()
+        # Emit new bid event
+        socketio.emit('new_bid', {
+            'IdentificationKey': new_bid.user.IdentificationKey,
+            'amount': new_bid.amount,
+            'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        })
         flash('Your bid has been placed successfully!', 'success')
         return redirect(url_for('bidding'))
     return render_template('bid.html', form=form)
