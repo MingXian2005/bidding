@@ -10,6 +10,18 @@ from sqlalchemy import asc
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
+## Incase of directory issue from flask
+# import os
+# print("TEMPLATE DIR:", os.getcwd(), flush=True)
+
+# Define upload folder (do this near app config)
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'application', 'static', 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+################################################################################################
+#homepage
+################################################################################################
 
 @app.route('/')
 def index():
@@ -17,6 +29,10 @@ def index():
         return redirect(url_for('bidding'))
     loginform = LoginForm()
     return render_template('login.html', form=loginform, title="Authentication")
+
+################################################################################################
+#auth / login
+################################################################################################
 
 @app.route('/auth', methods=['GET','POST'])
 def auth():
@@ -33,6 +49,10 @@ def auth():
             flash('Invalid Identification Key or password.', 'danger')
     return render_template('login.html', form=loginform, title="Authentication")
 
+################################################################################################
+#logout
+################################################################################################
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -40,11 +60,9 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('index'))
 
-
-# Define upload folder (do this near app config)
-UPLOAD_FOLDER = os.path.join(os.getcwd(), 'application', 'static', 'uploads')
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+################################################################################################
+# placing bid
+################################################################################################
 
 @app.route('/bid', methods=['GET', 'POST'])
 @login_required
@@ -128,10 +146,9 @@ def bid():
         starting_price=STARTING_PRICE
     )
 
-
-# import os
-# print("TEMPLATE DIR:", os.getcwd(), flush=True)
-
+################################################################################################
+# bidding history
+################################################################################################
 from flask import render_template
 from application import app
 
