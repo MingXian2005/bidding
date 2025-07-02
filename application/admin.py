@@ -23,3 +23,30 @@ def admin_register():
         flash('User registered successfully!', 'success')
         return redirect(url_for('admin_register'))
     return render_template('register.html', form=form, title="Admin Registration")
+
+
+@app.route('/admin/page', methods=['GET', 'POST'])
+def admin_page():
+    form = TimerForm()
+    # if form.validate_on_submit():
+    #     duration = form.duration.data
+    #     end_time = datetime.utcnow() + timedelta(minutes=duration)
+    #     timer = Timer(end_time=end_time)
+    #     db.session.add(timer)
+    #     db.session.commit()
+    #     flash(f'Timer started for {duration} minutes.', 'success')
+    #     return redirect(url_for('admin_page'))
+    return render_template('admin_page.html', form=form, title="Admin Page")
+
+@app.route('/admin/page/start', methods=['GET', 'POST'])
+def start():
+    form = TimerForm()
+    if form.validate_on_submit():
+        duration = form.duration.data
+        end_time = datetime.utcnow() + timedelta(minutes=duration)
+        timer = Timer(end_time=end_time)
+        db.session.add(timer)
+        db.session.commit()
+        flash(f'Timer started for {duration} minutes.', 'success')
+        return redirect(url_for('admin_page'))
+    return render_template('admin_page.html', form=form, title="Admin Page")

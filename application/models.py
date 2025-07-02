@@ -26,3 +26,6 @@ class Bid(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('bids', lazy=True))
 
+class Timer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore")), nullable=False) 
