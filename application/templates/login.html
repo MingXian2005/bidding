@@ -20,15 +20,13 @@ crossorigin="anonymous">
 </head>
 <body>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <div class="flash">
-        {% for msg in messages %}
-          <p>{{ msg }}</p>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="flash">
+      <p>{{ messages[-1] }}</p>
+    </div>
+  {% endif %}
+{% endwith %}
 
 {% block content %}
 <div class="row">
