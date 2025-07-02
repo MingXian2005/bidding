@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Bidding Page</title>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         var socket = io();
 
-        socket.on('new_bid', function(data) {
+        socket.on('new_bid', function (data) {
             // Option 1: Reload the page (simple)
             location.reload();
 
@@ -15,6 +16,7 @@
         });
     </script>
 </head>
+
 <body>
     <h1>Bidding Rankings</h1>
     <table border="1" cellpadding="5" cellspacing="0">
@@ -35,9 +37,13 @@
                 <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
             </tr>
             {% else %}
-            <tr><td colspan="4">No bids found.</td></tr>
+            <tr>
+                <td colspan="4">No bids found.</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
+    <a class="btn" href="/bid" role="button">Bid</a>
 </body>
+
 </html>
