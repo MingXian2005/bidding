@@ -1,12 +1,13 @@
 from application import app, db
 from application.forms import LoginForm, RegistrationForm, BidForm
-from application.models import User, Bid
+from application.models import User, Bid, Timer
 from flask import render_template, request, flash, json, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import asc
+from datetime import datetime
 
 
 @app.route('/')
@@ -58,6 +59,11 @@ from datetime import datetime
 @login_required
 def bid():
     form = BidForm()
+    timer = Timer.query.order_by(Timer.id.desc()).first()
+    if timer and datetime.utcnow() > timer.end_time:
+        flash('The bidding period has ended. No more bids can be placed.', 'danger')
+        return redirect(url_for('bidding'))
+
     if form.validate_on_submit():
         new_bid = Bid(amount=form.amount.data, user=current_user)
         db.session.add(new_bid)
@@ -74,5 +80,6 @@ from application import app
 
 @app.route('/bidding', methods=['GET'])
 def bidding():
-    bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
-    return render_template('bidding.html', bids=bids)
+    bids = Bid.query.order_by(asc(Bid.amount)).all()  
+    timer = Timer.query.order_by(Timer.id.desc()).first()
+    return render_template('bidding.html', bids=bids, timer=timer)

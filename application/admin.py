@@ -1,7 +1,8 @@
 from application import app, db
-from application.models import User
+from application.models import User, Timer
 from flask import render_template, request, flash, redirect, url_for
-from application.forms import RegistrationForm
+from application.forms import RegistrationForm, TimerForm
+from datetime import datetime, timedelta
 
 @app.route('/admin/register', methods=['GET', 'POST'])
 def admin_register():
@@ -23,3 +24,16 @@ def admin_register():
         flash('User registered successfully!', 'success')
         return redirect(url_for('admin_register'))
     return render_template('register.html', form=form, title="Admin Registration")
+
+@app.route('/admin/page', methods=['GET', 'POST'])
+def admin_page():
+    form = TimerForm()
+    if form.validate_on_submit():
+        duration = form.duration.data
+        end_time = datetime.utcnow() + timedelta(minutes=duration)
+        timer = Timer(end_time=end_time)
+        db.session.add(timer)
+        db.session.commit()
+        flash(f'Timer started for {duration} minutes.', 'success')
+        return redirect(url_for('admin_page'))
+    return render_template('admin_page.html', form=form, title="Admin Page")

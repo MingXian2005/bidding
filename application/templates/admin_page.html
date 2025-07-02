@@ -1,0 +1,15 @@
+{% block content %}
+<div class="container">
+    <h2>Admin Page</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.duration.label(class="form-control-label") }}
+            {{ form.duration(class="form-control form-control-lg") }}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}
