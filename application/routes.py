@@ -20,6 +20,13 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ################################################################################################
+AUCTION_DURATION = 12 * 60 * 60  # 5 minutes in seconds
+AUCTION_EXTENSION = 60     # 60 seconds per bid
+STARTING_PRICE = 100.00  # or whatever your starting price is
+
+auction_end_time = None    # Will be set on first bid
+
+################################################################################################
 #homepage
 ################################################################################################
 
@@ -72,6 +79,7 @@ def bid():
 
     # Fetch latest timer
     timer = Timer.query.order_by(Timer.id.desc()).first()
+    end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
     auction_started = timer is not None
     auction_over = False
     auction_end_time = None
@@ -143,7 +151,9 @@ def bid():
         auction_over=auction_over,
         auction_started=auction_started,
         AUCTION_DURATION=AUCTION_DURATION,
-        starting_price=STARTING_PRICE
+        starting_price=STARTING_PRICE,
+        timer=timer,
+        end_time_iso=end_time_iso
     )
 
 ################################################################################################
@@ -159,9 +169,4 @@ def bidding():
     end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
     return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
 
-# Set auction end time (example: 5 minutes from server start)
-AUCTION_DURATION = 1 * 2 * 60  # 5 minutes in seconds
-AUCTION_EXTENSION = 60     # 60 seconds per bid
-STARTING_PRICE = 100.00  # or whatever your starting price is
 
-auction_end_time = None    # Will be set on first bid

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Place a Bid</title>
     <style>
@@ -9,36 +10,41 @@
             gap: 40px;
             margin-top: 40px;
         }
+
         .bid-image {
             max-width: 250px;
             border: 1px solid #ccc;
             border-radius: 8px;
         }
+
         .bid-info {
             min-width: 300px;
         }
+
         .timer {
             font-size: 1.2em;
             color: #d9534f;
             margin-bottom: 15px;
         }
+
         .starting-price {
             font-weight: bold;
             margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul>
+    {% if messages %}
+    <ul>
         {% for category, message in messages %}
-          <li style="color: {% if category == 'danger' %}red{% else %}green{% endif %};">
+        <li style="color: {% if category == 'danger' %}red{% else %}green{% endif %};">
             {{ message }}
-          </li>
+        </li>
         {% endfor %}
-        </ul>
-      {% endif %}
+    </ul>
+    {% endif %}
     {% endwith %}
     <h1>Place a Bid</h1>
     <div class="bid-container">
@@ -51,10 +57,10 @@
             <div class="starting-price">Starting Price: S$ {{ starting_price or "0.00" }}</div>
             <div class="timer">
                 {% if not auction_started %}
-                    Auction has not started. Timer will start on first bid.<br>
-                    Time Left: <span id="timer">{{ (AUCTION_DURATION // 60) }}:00</span>
+                Auction has not started. Timer will start on first bid.<br>
+                Time Left:<div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div></span>
                 {% else %}
-                    Time Left: <span id="timer"></span>
+                Time Left: <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div></span>
                 {% endif %}
             </div>
             <form method="POST" action="{{ url_for('bid') }}">
@@ -63,7 +69,7 @@
                     {{ form.amount.label }}<br>
                     {{ form.amount(size=10) }}<br>
                     {% for error in form.amount.errors %}
-                        <span style="color: red;">{{ error }}</span><br>
+                    <span style="color: red;">{{ error }}</span><br>
                     {% endfor %}
                 </p>
                 <p>
@@ -76,22 +82,31 @@
         </div>
     </div>
     <script>
-        // eslint-disable-next-line
-        let seconds = {{ time_left|default(0) }};
-        {% if auction_started %}
-        function updateTimer() {
-            let min = Math.floor(seconds / 60);
-            let sec = seconds % 60;
-            document.getElementById('timer').textContent =
-                min + ":" + (sec < 10 ? "0" : "") + sec;
-            if (seconds > 0) seconds--;
-        }
-        window.onload = function() {
-            setInterval(updateTimer, 1000);
+        const timerElement = document.getElementById('timer');
+        if (timerElement) {
+            const endTime = new Date("{{ end_time_iso }}").getTime();
+
+            function updateTimer() {
+                const now = new Date();
+                const timeLeft = endTime - now;
+
+                if (timeLeft < 0) {
+                    timerElement.innerHTML = "Bidding has ended!";
+                    return;
+                }
+
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                timerElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+
             updateTimer();
+            setInterval(updateTimer, 1000);
         }
-        {% endif %}
     </script>
 </body>
-</html>
 
+</html>
