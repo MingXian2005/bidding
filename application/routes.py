@@ -7,7 +7,8 @@ from . import admin
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import asc
-from datetime import datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 @app.route('/')
@@ -65,12 +66,17 @@ def bid():
         return redirect(url_for('bidding'))
 
     if form.validate_on_submit():
+        if timer:
+            time_left = timer.end_time.astimezone(ZoneInfo("UTC")) - datetime.now(ZoneInfo("UTC"))
+            if time_left < timedelta(minutes=20):
+                timer.end_time += timedelta(minutes=1)
+                flash('Timer extended by 1 minute!', 'info')
         new_bid = Bid(amount=form.amount.data, user=current_user)
         db.session.add(new_bid)
         db.session.commit()
         flash('Your bid has been placed successfully!', 'success')
         return redirect(url_for('bidding'))
-    return render_template('bid.html', form=form)
+    return render_template('bid.html', form=form, timer=timer)
 
 # import os
 # print("TEMPLATE DIR:", os.getcwd(), flush=True)
