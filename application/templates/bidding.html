@@ -19,6 +19,9 @@
 
 <body>
     <h1>Bidding Rankings</h1>
+        {% if timer %}
+    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+    {% endif %}
     <table border="1" cellpadding="5" cellspacing="0">
         <thead>
             <tr>
@@ -48,7 +51,7 @@
     <script>
     const timerElement = document.getElementById('timer');
     if (timerElement) {
-        const endTime = new Date(timerElement.dataset.endTime + 'Z');
+        const endTime = new Date("{{ end_time_iso }}").getTime();
 
         function updateTimer() {
             const now = new Date();
