@@ -58,7 +58,6 @@
             <div class="timer">
                 {% if not auction_started %}
                 Auction has not started. Timer will start on first bid.<br>
-                Time Left:<div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div></span>
                 {% else %}
                 Time Left: <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div></span>
                 {% endif %}
