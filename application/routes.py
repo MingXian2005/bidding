@@ -1,6 +1,6 @@
 from application import app, db, socketio
 from application.forms import LoginForm, RegistrationForm, BidForm
-from application.models import Users, Bid, Timer
+from application.models import Users, Bid, Timer, Initials
 from flask import render_template, request, flash, json, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
@@ -22,7 +22,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ################################################################################################
 AUCTION_DURATION = 12 * 60 * 60  # 5 minutes in seconds
 AUCTION_EXTENSION = 60     # 60 seconds per bid
-STARTING_PRICE = 100.00  # or whatever your starting price is
+# STARTING_PRICE = 100.00  # or whatever your starting price is
 
 auction_end_time = None    # Will be set on first bid
 
@@ -99,15 +99,27 @@ def bid():
 
     # Get current lowest bid
     lowest_bid = db.session.query(Bid).order_by(Bid.amount.asc()).first()
-    lowest_bid_amount = lowest_bid.amount if lowest_bid else None
+    lowest_bid_amount = lowest_bid.amount if lowest_bid else None 
+
+    # Get decrement value
+    decrement = db.session.query(Initials).order_by(Initials.BidDecrement).first()
+    Decrement = decrement.BidDecrement if decrement else 0
+
+    # Get initial bid value
+    Starting_price = db.session.query(Initials).order_by(Initials.StartingBid).first()
+    STARTING_PRICE = Starting_price.StartingBid if Starting_price else 1000
 
     if form.validate_on_submit() and not auction_over:
         bid_value = form.amount.data
 
         if bid_value >= STARTING_PRICE:
             flash(f'Your bid must be LOWER than the starting price (S$ {STARTING_PRICE:.2f}).', 'danger')
-        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount: # MOdify this in the future
+        elif bid_value >= STARTING_PRICE - Decrement: 
+            flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
+        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount: 
             flash(f'Your bid must be LOWER than the current lowest bid (S$ {lowest_bid_amount:.2f}).', 'danger')
+        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount - Decrement: 
+            flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
         elif bid_value < 0.01:
             flash('Your bid must be at least S$ 0.01.', 'danger')
         else:
@@ -121,6 +133,7 @@ def bid():
                 if time_left <= 120:
                     auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
                     timer.end_time = auction_end_time
+                    print()
 
             # Save bid
             new_bid = Bid(amount=bid_value, user=current_user)
