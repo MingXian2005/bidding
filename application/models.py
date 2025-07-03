@@ -6,9 +6,9 @@ from zoneinfo import ZoneInfo
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return Users.query.get(int(user_id))
 
-class User(db.Model, UserMixin):
+class Users(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     IdentificationKey = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
@@ -23,8 +23,8 @@ class Bid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore")))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=db.backref('bids', lazy=True))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('Users', backref=db.backref('bids', lazy=True))
 
 class Timer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

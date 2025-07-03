@@ -1,6 +1,6 @@
 from application import app, db, socketio
 from application.forms import LoginForm, RegistrationForm, BidForm
-from application.models import User, Bid, Timer
+from application.models import Users, Bid, Timer
 from flask import render_template, request, flash, json, jsonify, redirect, url_for
 from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
@@ -47,7 +47,7 @@ def auth():
         return redirect(url_for('bidding'))
     loginform = LoginForm()
     if loginform.validate_on_submit():
-        user = User.query.filter_by(IdentificationKey=loginform.IdentificationKey.data).first()
+        user = Users.query.filter_by(IdentificationKey=loginform.IdentificationKey.data).first()
         if user and user.check_password(loginform.password.data):
             login_user(user)
             flash('Login successful.', 'success')

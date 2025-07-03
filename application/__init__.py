@@ -23,9 +23,16 @@ login_manager = LoginManager(app)
 socketio = SocketIO(app, async_mode='eventlet')
 
 with app.app_context():
-    from .models import User, Bid, Timer
+    from .models import Users, Bid, Timer
     db.drop_all()
     db.create_all()
+
+    # Create admin user
+    if not Users.query.filter_by(IdentificationKey='admin').first():
+        admin = Users(IdentificationKey='admin')
+        admin.set_password('admin')
+        db.session.add(admin)
+
     db.session.commit()
     print('Created Database!')
 

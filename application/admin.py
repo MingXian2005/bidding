@@ -1,5 +1,5 @@
 from application import app, db
-from application.models import User, Timer
+from application.models import Users, Timer
 from flask import render_template, request, flash, redirect, url_for
 from application.forms import RegistrationForm, TimerForm
 from datetime import datetime, timedelta
@@ -13,12 +13,12 @@ def admin_register():
         password = form.password.data
         
         # Check if IdentificationKey already exists
-        existing_user = User.query.filter_by(IdentificationKey=IdentificationKey).first()
+        existing_user = Users.query.filter_by(IdentificationKey=IdentificationKey).first()
         if existing_user:
             flash('IdentificationKey already exists. Please choose a different one.', 'danger')
             return render_template('register.html', form=form, title="Admin Registration")
 
-        new_user = User(IdentificationKey=IdentificationKey)
+        new_user = Users(IdentificationKey=IdentificationKey)
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
