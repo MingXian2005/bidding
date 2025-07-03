@@ -27,6 +27,9 @@
 
     <div class="container">
         <h1>Bidding Rankings</h1>
+            {% if timer %}
+    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+    {% endif %}
         <table>
             <thead>
                 <tr>
