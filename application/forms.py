@@ -30,3 +30,4 @@ class TimerForm(FlaskForm):
 class InitialsForm(FlaskForm):
     StartingBid = FloatField('Starting Bid ($)', validators=[InputRequired()])
     BidDecrement = FloatField('Next Bid Decrement($)', validators=[InputRequired()])
+    submit = SubmitField('Confirm')

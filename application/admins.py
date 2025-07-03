@@ -1,9 +1,9 @@
 from application import app, db
-from application.models import Users, Timer
+from application.models import Users, Timer, Initials
 from flask_login import current_user, login_required
 from functools import wraps
 from flask import render_template, request, flash, redirect, url_for, abort
-from application.forms import RegistrationForm, TimerForm
+from application.forms import RegistrationForm, TimerForm, InitialsForm
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -79,3 +79,27 @@ def admin_start_auction():
     db.session.commit()
     flash(f'Auction started for {duration} minutes.', 'success')
     return redirect(url_for('admin_page'))
+
+@app.route('/admin/init', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_init():
+    form = InitialsForm()
+    return render_template('admin_init.html', form=form, title="Admin Init")
+
+@app.route('/admin/init/post', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_init_post():
+    form = InitialsForm()
+    if form.validate_on_submit():
+        StartingBid = form.StartingBid.data
+        BidDecrement = form.BidDecrement.data
+        Initials.query.delete()
+        db.session.commit()
+        new_initials = Initials(StartingBid=StartingBid, BidDecrement=BidDecrement)
+        db.session.add(new_initials)
+        db.session.commit()
+        flash('New initials set successfully!', 'success')
+        return redirect(url_for('admin_init'))
+    return render_template('admin_init.html', form=form, title="Admin Init")

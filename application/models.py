@@ -31,7 +31,7 @@ class Timer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore")), nullable=False) 
 
-class Initials(db.Initials):
+class Initials(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     StartingBid = db.Column(db.Float, nullable=False)
     BidDecrement = db.Column(db.Float, nullable=False)
