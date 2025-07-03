@@ -1,11 +1,29 @@
 from application import app, db
 from application.models import Users, Timer
-from flask import render_template, request, flash, redirect, url_for
+from flask_login import current_user, login_required
+from functools import wraps
+from flask import render_template, request, flash, redirect, url_for, abort
 from application.forms import RegistrationForm, TimerForm
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            abort(403)
+        if not current_user.is_admin:
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+
 @app.route('/admin/register', methods=['GET', 'POST'])
+@login_required
+@admin_required
+
 def admin_register():
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -28,6 +46,8 @@ def admin_register():
 
 
 @app.route('/admin/page', methods=['GET', 'POST'])
+@login_required
+@admin_required
 def admin_page():
     form = TimerForm()
     timer = Timer.query.order_by(Timer.id.desc()).first()
@@ -45,6 +65,8 @@ def admin_page():
     return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
 
 @app.route('/admin/page/start', methods=['POST'])
+@login_required
+@admin_required
 def admin_start_auction():
     # You can get duration from a form or use a default
     duration = int(request.form.get('duration', 5))  # default 5 minutes if not provided

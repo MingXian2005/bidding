@@ -5,10 +5,10 @@ import os
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
-# import psycopg2
+    # import psycopg2
 
 
-# Load .env variables
+    # Load .env variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -29,7 +29,7 @@ with app.app_context():
 
     # Create admin user
     if not Users.query.filter_by(IdentificationKey='admin').first():
-        admin = Users(IdentificationKey='admin')
+        admin = Users(IdentificationKey='admin', is_admin=True)
         admin.set_password('admin')
         db.session.add(admin)
 
@@ -37,4 +37,4 @@ with app.app_context():
     print('Created Database!')
 
 #run the file routes.py
-from application import routes
+from application import routes, admins
