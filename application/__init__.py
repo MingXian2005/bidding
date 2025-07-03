@@ -4,12 +4,18 @@ from datetime import datetime
 import os
 from flask_login import LoginManager
 from flask_socketio import SocketIO
+from dotenv import load_dotenv
+# import psycopg2
+
+
+# Load .env variables
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'  # For flash messages
 
 # Setup SQLite DB URI (file 'visitors.db' in current folder)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///visitors.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -18,6 +24,7 @@ socketio = SocketIO(app, async_mode='eventlet')
 
 with app.app_context():
     from .models import User, Bid, Timer
+    db.drop_all()
     db.create_all()
     db.session.commit()
     print('Created Database!')
