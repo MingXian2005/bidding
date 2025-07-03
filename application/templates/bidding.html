@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Bidding Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         var socket = io();
@@ -16,35 +16,43 @@
         });
     </script>
 </head>
-
 <body>
-    <h1>Bidding Rankings</h1>
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Identification Key</th>
-                <th>Bid Amount</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for bid in bids %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ bid.user.IdentificationKey }}</td>
-                <td>{{ bid.amount }}</td>
-                <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4">No bids found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a class="btn" href="/bid" role="button">Bid</a>
+    <div class="navbar">
+        <a href="{{ url_for('bidding') }}" class="active">Bidding</a>
+        <a href="{{ url_for('bid') }}">Bid</a>
+        <div class="navbar-right">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Bidding Rankings</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Identification Key</th>
+                    <th>Bid Amount</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bid in bids %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ bid.user.IdentificationKey }}</td>
+                    <td>{{ bid.amount }}</td>
+                    <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No bids found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/bid" class="btn" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Bid</a>
+    </div>
     <script>
     const timerElement = document.getElementById('timer');
     if (timerElement) {
@@ -72,5 +80,4 @@
     }
 </script>
 </body>
-
 </html>
