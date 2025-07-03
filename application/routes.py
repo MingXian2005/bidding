@@ -84,6 +84,9 @@ def bid():
     auction_over = False
     auction_end_time = None
 
+    # Latest bid done by the user
+    latest_bid = Bid.query.filter_by(user_id=current_user.id).order_by(Bid.timestamp.desc()).first()
+
     if auction_started:
         auction_end_time = timer.end_time
         # Ensure timezone awareness
@@ -153,7 +156,8 @@ def bid():
         AUCTION_DURATION=AUCTION_DURATION,
         starting_price=STARTING_PRICE,
         timer=timer,
-        end_time_iso=end_time_iso
+        end_time_iso=end_time_iso,
+        latest_bid=latest_bid
     )
 
 ################################################################################################

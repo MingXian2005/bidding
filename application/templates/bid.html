@@ -46,37 +46,51 @@
 
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
         <h1>Place a Bid</h1>
         <div style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px;">
             <!-- Left: Image -->
             <div style="flex: 1; max-width: 250px;">
-                <img src="{{ url_for('static', filename='uploads/your_image.jpg') }}" alt="Auction Item" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;">
+                <img src="{{ url_for('static', filename='uploads/your_image.jpg') }}" alt="Auction Item"
+                    style="width: 100%; border: 1px solid #ccc; border-radius: 8px;">
             </div>
             <!-- Right: Info, timer, form -->
             <div style="flex: 2; min-width: 300px;">
-                <div style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price or "0.00" }}</div>
+                <div style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price or "0.00" }}
+                </div>
                 <div style="font-size: 1.2em; color: #d9534f; margin-bottom: 15px;">
                     {% if not auction_started %}
-                        Auction has not started. Timer will start on first bid.<br>
+                    Auction has not started. Timer will start on first bid.<br>
                     {% else %}
-                        Time Left: <span id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></span>
+                    Time Left: <span id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></span>
                     {% endif %}
                 </div>
+                {% if latest_bid %}
+                <div style="margin-bottom: 10px;">
+                    <strong>Your Latest Bid:</strong>
+                    S$ {{ "%.2f"|format(latest_bid.amount) }}
+                    at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                </div>
+                {% else %}
+                <div style="margin-bottom: 10px;">
+                    <strong>No latest bid done by you yet.</strong>
+                </div>
+                {% endif %}
                 <form method="POST" action="{{ url_for('bid') }}">
                     {{ form.hidden_tag() }}
                     <p>
                         {{ form.amount.label }}<br>
                         {{ form.amount(size=20) }}<br>
                         {% for error in form.amount.errors %}
-                            <span style="color: red;">{{ error }}</span><br>
+                        <span style="color: red;">{{ error }}</span><br>
                         {% endfor %}
                     </p>
+
                     <p>
                         <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}>
                     </p>
