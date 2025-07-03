@@ -7,7 +7,6 @@ from . import admin
 import os
 from werkzeug.utils import secure_filename
 from sqlalchemy import asc, func, desc
-from sqlalchemy.orm import aliased
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -110,6 +109,32 @@ def bid():
     Starting_price = db.session.query(Initials).order_by(Initials.StartingBid).first()
     STARTING_PRICE = Starting_price.StartingBid if Starting_price else 1000
 
+    # Subquery: get the latest bid timestamp for each user
+    latest_bids_subq = (
+        db.session.query(
+            Bid.user_id,
+            func.max(Bid.timestamp).label('max_timestamp')
+        )
+        .group_by(Bid.user_id)
+        .subquery()
+    )
+
+    # Join to get the actual latest bid for each user
+    latest_bids = (
+        db.session.query(Bid)
+        .join(latest_bids_subq, (Bid.user_id == latest_bids_subq.c.user_id) & (Bid.timestamp == latest_bids_subq.c.max_timestamp))
+        .order_by(Bid.amount.asc())
+        .all()
+    )
+
+    # Build a ranking dict: user_id -> rank
+    ranking = {}
+    for idx, bid in enumerate(latest_bids, start=1):
+        ranking[bid.user_id] = idx
+
+    # Get current user's rank (if they have a bid)
+    user_rank = ranking.get(current_user.id)
+
 
     if form.validate_on_submit() and not auction_over:
         bid_value = form.amount.data
@@ -172,7 +197,9 @@ def bid():
         starting_price=STARTING_PRICE,
         timer=timer,
         end_time_iso=end_time_iso,
-        latest_bid=latest_bid
+        latest_bid=latest_bid,
+        user_rank=user_rank,
+        ranking=ranking
     )
 
 ################################################################################################

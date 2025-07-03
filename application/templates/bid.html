@@ -75,6 +75,7 @@
                     <strong>Your Latest Bid:</strong>
                     S$ {{ "%.2f"|format(latest_bid.amount) }}
                     at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                       Rank: {{ user_rank }}
                 </div>
                 {% else %}
                 <div style="margin-bottom: 10px;">
