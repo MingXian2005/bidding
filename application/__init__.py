@@ -23,7 +23,7 @@ login_manager = LoginManager(app)
 socketio = SocketIO(app, async_mode='eventlet')
 
 with app.app_context():
-    from .models import Users, Bid, Timer
+    from .models import Users, Bid, Timer, Initials
     db.drop_all()
     db.create_all()
 

@@ -106,7 +106,7 @@ def bid():
 
         if bid_value >= STARTING_PRICE:
             flash(f'Your bid must be LOWER than the starting price (S$ {STARTING_PRICE:.2f}).', 'danger')
-        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount:
+        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount: # MOdify this in the future
             flash(f'Your bid must be LOWER than the current lowest bid (S$ {lowest_bid_amount:.2f}).', 'danger')
         elif bid_value < 0.01:
             flash('Your bid must be at least S$ 0.01.', 'danger')

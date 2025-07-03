@@ -25,3 +25,8 @@ class LoginForm(FlaskForm):
 class TimerForm(FlaskForm):
     duration = IntegerField('Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
     submit = SubmitField('Set Timer')
+
+
+class InitialsForm(FlaskForm):
+    StartingBid = FloatField('Starting Bid ($)', validators=[InputRequired()])
+    BidDecrement = FloatField('Next Bid Decrement($)', validators=[InputRequired()])
