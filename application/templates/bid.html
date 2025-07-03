@@ -1,111 +1,76 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Place a Bid</title>
-    <style>
-        .bid-container {
-            display: flex;
-            align-items: flex-start;
-            gap: 40px;
-            margin-top: 40px;
-        }
-
-        .bid-image {
-            max-width: 250px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        .bid-info {
-            min-width: 300px;
-        }
-
-        .timer {
-            font-size: 1.2em;
-            color: #d9534f;
-            margin-bottom: 15px;
-        }
-
-        .starting-price {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
 </head>
-
 <body>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <ul>
-        {% for category, message in messages %}
-        <li style="color: {% if category == 'danger' %}red{% else %}green{% endif %};">
-            {{ message }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
-    <h1>Place a Bid</h1>
-    <div class="bid-container">
-        <!-- Left: Image -->
-        <div>
-            <img src="../static/uploads/your_image.jpg" alt="Auction Item" class="bid-image">
+    <div class="navbar">
+        <a href="{{ url_for('bidding') }}">Bidding</a>
+        <a href="{{ url_for('bid') }}" class="active">Bid</a>
+        <div class="navbar-right">
+            <a href="{{ url_for('logout') }}">Logout</a>
         </div>
-        <!-- Right: Info, timer, form -->
-        <div class="bid-info">
-            <div class="starting-price">Starting Price: S$ {{ starting_price or "0.00" }}</div>
-            <div class="timer">
-                {% if not auction_started %}
-                Auction has not started. Timer will start on first bid.<br>
-                {% else %}
-                Time Left: <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div></span>
-                {% endif %}
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <h1>Place a Bid</h1>
+        <div style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px;">
+            <!-- Left: Image -->
+            <div style="flex: 1; max-width: 250px;">
+                <img src="{{ url_for('static', filename='uploads/your_image.jpg') }}" alt="Auction Item" style="width: 100%; border: 1px solid #ccc; border-radius: 8px;">
             </div>
-            <form method="POST" action="{{ url_for('bid') }}">
-                {{ form.hidden_tag() }}
-                <p>
-                    {{ form.amount.label }}<br>
-                    {{ form.amount(size=10) }}<br>
-                    {% for error in form.amount.errors %}
-                    <span style="color: red;">{{ error }}</span><br>
-                    {% endfor %}
-                </p>
-                <p>
-                    <button type="submit" id="bid-btn" {% if auction_over %}disabled{% endif %}>
-                        Place Bid
-                    </button>
-                </p>
-            </form>
-            <p><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
+            <!-- Right: Info, timer, form -->
+            <div style="flex: 2; min-width: 300px;">
+                <div style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price or "0.00" }}</div>
+                <div style="font-size: 1.2em; color: #d9534f; margin-bottom: 15px;">
+                    {% if not auction_started %}
+                        Auction has not started. Timer will start on first bid.<br>
+                        Time Left: <span id="timer">{{ (AUCTION_DURATION // 60) }}:00</span>
+                    {% else %}
+                        Time Left: <span id="timer"></span>
+                    {% endif %}
+                </div>
+                <form method="POST" action="{{ url_for('bid') }}">
+                    {{ form.hidden_tag() }}
+                    <p>
+                        {{ form.amount.label }}<br>
+                        {{ form.amount(size=20) }}<br>
+                        {% for error in form.amount.errors %}
+                            <span style="color: red;">{{ error }}</span><br>
+                        {% endfor %}
+                    </p>
+                    <p>
+                        <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}>
+                    </p>
+                </form>
+                <p><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
+            </div>
         </div>
     </div>
     <script>
-        const timerElement = document.getElementById('timer');
-        if (timerElement) {
-            const endTime = new Date("{{ end_time_iso }}").getTime();
-
-            function updateTimer() {
-                const now = new Date();
-                const timeLeft = endTime - now;
-
-                if (timeLeft < 0) {
-                    timerElement.innerHTML = "Bidding has ended!";
-                    return;
-                }
-
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                timerElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            }
-
-            updateTimer();
-            setInterval(updateTimer, 1000);
+        // eslint-disable-next-line
+        let seconds = {{ time_left|default(0) }};
+        {% if auction_started %}
+        function updateTimer() {
+            let min = Math.floor(seconds / 60);
+            let sec = seconds % 60;
+            document.getElementById('timer').textContent =
+                min + ":" + (sec < 10 ? "0" : "") + sec;
+            if (seconds > 0) seconds--;
         }
+        window.onload = function() {
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+        {% endif %}
     </script>
 </body>
-
 </html>
