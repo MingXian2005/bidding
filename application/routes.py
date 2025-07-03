@@ -199,7 +199,8 @@ def bid():
         end_time_iso=end_time_iso,
         latest_bid=latest_bid,
         user_rank=user_rank,
-        ranking=ranking
+        ranking=ranking,
+        decrement=Decrement
     )
 
 ################################################################################################
