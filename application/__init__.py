@@ -38,3 +38,4 @@ with app.app_context():
 
 #run the file routes.py
 from application import routes
+from application import admins

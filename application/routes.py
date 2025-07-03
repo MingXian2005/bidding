@@ -174,3 +174,16 @@ def bidding():
     return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
 
 
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    print(current_user)                # Shows the user object
+    print(current_user.id)             # User's ID
+    print(current_user.is_authenticated)  # True if logged in
+    return f"Welcome {current_user.IdentificationKey}!"
+
+
+
+
+
