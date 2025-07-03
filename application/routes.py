@@ -6,7 +6,8 @@ from flask_login import login_user, logout_user, login_required, current_user
 from . import admin
 import os
 from werkzeug.utils import secure_filename
-from sqlalchemy import asc
+from sqlalchemy import asc, func, desc
+from sqlalchemy.orm import aliased
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -109,6 +110,7 @@ def bid():
     Starting_price = db.session.query(Initials).order_by(Initials.StartingBid).first()
     STARTING_PRICE = Starting_price.StartingBid if Starting_price else 1000
 
+
     if form.validate_on_submit() and not auction_over:
         bid_value = form.amount.data
 
@@ -180,6 +182,7 @@ from flask import render_template
 from application import app
 
 @app.route('/bidding', methods=['GET'])
+@login_required
 def bidding():
     bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
     timer = Timer.query.order_by(Timer.id.desc()).first()
