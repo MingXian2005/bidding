@@ -218,4 +218,18 @@ def bidding():
     end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
     return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
 
+@app.route('/reset', methods=['POST', 'GET'])
+@login_required
+def reset():
+    # Optional: Only allow admin to reset
+    if not current_user.is_admin:
+        flash('Only admin can reset the auction.', 'danger')
+        return redirect(url_for('bid'))
 
+    # Delete all bids
+    Bid.query.delete()
+    # Delete all timers
+    Timer.query.delete()
+    db.session.commit()
+    flash('All bids and auction timer have been reset.', 'success')
+    return redirect(url_for('bid'))
