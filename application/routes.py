@@ -33,7 +33,7 @@ auction_end_time = None    # Will be set on first bid
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('bidding'))
+        return redirect(url_for('bid'))
     loginform = LoginForm()
     return render_template('login.html', form=loginform, title="Authentication")
 
@@ -44,14 +44,14 @@ def index():
 @app.route('/auth', methods=['GET','POST'])
 def auth():
     if current_user.is_authenticated:
-        return redirect(url_for('bidding'))
+        return redirect(url_for('bid'))
     loginform = LoginForm()
     if loginform.validate_on_submit():
         user = Users.query.filter_by(IdentificationKey=loginform.IdentificationKey.data).first()
         if user and user.check_password(loginform.password.data):
             login_user(user)
             flash('Login successful.', 'success')
-            return redirect(url_for('bidding'))
+            return redirect(url_for('bid'))
         else:
             flash('Invalid Identification Key or password.', 'danger')
     return render_template('login.html', form=loginform, title="Authentication")
