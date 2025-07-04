@@ -200,7 +200,8 @@ def bid():
         latest_bid=latest_bid,
         user_rank=user_rank,
         ranking=ranking,
-        decrement=Decrement
+        decrement=Decrement,
+        lowest_bidding = lowest_bid_amount
     )
 
 ################################################################################################

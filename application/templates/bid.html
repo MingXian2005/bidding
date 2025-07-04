@@ -79,13 +79,21 @@
                     <strong>Your Latest Bid:</strong>
                     S$ {{ "%.2f"|format(latest_bid.amount) }}
                     at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
-                       Rank: {{ user_rank }}
+                    Rank: {{ user_rank }}
                 </div>
                 {% else %}
                 <div style="margin-bottom: 10px;">
                     <strong>No latest bid done by you yet.</strong>
                 </div>
                 {% endif %}
+                <div style="font-weight: bold; margin-bottom: 10px;">
+                    Lowest Current Bid:
+                    {% if lowest_bidding %}
+                    S$ {{ "%.2f"|format(lowest_bidding) }}
+                    {% else %}
+                    No bids yet
+                    {% endif %}
+                </div>
                 <form method="POST" action="{{ url_for('bid') }}">
                     {{ form.hidden_tag() }}
                     <p>

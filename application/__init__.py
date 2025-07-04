@@ -5,7 +5,6 @@ import os
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
-    # import psycopg2
 
 
     # Load .env variables
