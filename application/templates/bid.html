@@ -61,11 +61,11 @@
             </div>
             <!-- Right: Info, timer, form -->
             <div style="flex: 2; min-width: 300px;">
-                <div style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price or "0.00" }}
+                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price or "0.00" }}
                 </div>
-                <div style="font-weight: bold; margin-bottom: 10px;">Min Lot Decrement: S$ {{ decrement or "0.00" }}
+                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">Min Lot Decrement: S$ {{ decrement or "0.00" }}
                 </div>
-                <div style="font-size: 1.2em; color: #d9534f; margin-bottom: 15px;">
+                <div class=class1 style="font-size: 1.2em; color: #d9534f; margin-bottom: 15px;">
                     {% if not auction_started %}
                     Auction has not started. Timer will start on first bid.<br>
                     {% else %}
@@ -75,18 +75,18 @@
                     {% endif %}
                 </div>
                 {% if latest_bid %}
-                <div style="margin-bottom: 10px;">
+                <div class=class1 style="margin-bottom: 10px;">
                     <strong>Your Latest Bid:</strong>
                     S$ {{ "%.2f"|format(latest_bid.amount) }}
                     at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                     Rank: {{ user_rank }}
                 </div>
                 {% else %}
-                <div style="margin-bottom: 10px;">
+                <div class=class1 style="margin-bottom: 10px;">
                     <strong>No latest bid done by you yet.</strong>
                 </div>
                 {% endif %}
-                <div style="font-weight: bold; margin-bottom: 10px;">
+                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">
                     Lowest Current Bid:
                     {% if lowest_bidding %}
                     S$ {{ "%.2f"|format(lowest_bidding) }}
@@ -108,7 +108,7 @@
                         <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}>
                     </p>
                 </form>
-                <p><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
+                <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
             </div>
         </div>
     </div>
