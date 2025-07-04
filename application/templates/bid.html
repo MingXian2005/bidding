@@ -54,14 +54,14 @@
         {% endwith %}
         <h1>Place a Bid</h1>
         <div
-            style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px; margin-left:40px">
+            style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px;">
             <!-- Left: Image -->
-            <div style="flex: 1; max-width: 250px;">
-                <img src="{{ url_for('static', filename='uploads/your_image.jpg') }}" alt="Auction Item"
+            <div style="flex: 1; max-width: 380px;">
+                <img src="{{ url_for('static', filename='uploads/project.jpeg') }}" alt="Auction Item"
                     style="width: 100%; border: 1px solid #ccc; border-radius: 8px;">
             </div>
             <!-- Right: Info, timer, form -->
-            <div style="flex: 2; max-width: 300px; justify-content: center;">
+            <div style="flex: 2; max-width: 350px; justify-content: center; margin-right: 40px;">
                 <div class=class1 style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price
                     or "0.00" }}
                 </div>
