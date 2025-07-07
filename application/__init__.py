@@ -5,7 +5,7 @@ import os
 from flask_login import LoginManager
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
-
+from sqlalchemy import text
 
     # Load .env variables
 load_dotenv()
@@ -32,8 +32,9 @@ with app.app_context():
         admin.set_password('admin')
         db.session.add(admin)
 
+    db.session.execute(text("SET TIME ZONE 'Asia/Singapore';"))
     db.session.commit()
     print('Created Database!')
 
 #run the file routes.py
-from application import routes, admins
+from application import routes1, admins

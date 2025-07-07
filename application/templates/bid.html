@@ -108,7 +108,8 @@
                     </p>
 
                     <p>
-                        <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}>
+                        <input type="submit" id="bid-btn" value="Place Bid">
+                        <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
             </div>
@@ -118,7 +119,7 @@
     <script>
         const timerElement = document.getElementById('timer');
         if (timerElement) {
-            const endTime = new Date(timerElement.dataset.endTime + 'Z');
+            const endTime = new Date(timerElement.dataset.endTime);
 
             function updateTimer() {
                 const now = new Date();
