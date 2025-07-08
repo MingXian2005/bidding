@@ -32,7 +32,7 @@ with app.app_context():
         admin.set_password('admin')
         db.session.add(admin)
 
-    db.session.execute(text("SET TIME ZONE 'Asia/Singapore';"))
+    # db.session.execute(text("SET TIME ZONE 'Asia/Singapore';"))
     db.session.commit()
     print('Created Database!')
 

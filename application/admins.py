@@ -51,10 +51,10 @@ def admin_register():
 def admin_page():
     form = TimerForm()
     timer = Timer.query.order_by(Timer.id.desc()).first()
+
     if form.validate_on_submit():
         duration = form.duration.data  # duration in minutes
         end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
-        # Remove old timers if you want only one active
         Timer.query.delete()
         db.session.commit()
         timer = Timer(end_time=end_time)
@@ -62,14 +62,28 @@ def admin_page():
         db.session.commit()
         flash(f'Auction timer set for {duration} minutes.', 'success')
         return redirect(url_for('admin_page'))
-    return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
+
+    # Initialize end_time to None by default
+    end_time = None
+
+    if timer and timer.end_time:
+        # If the timestamp has no timezone info, assign UTC
+        if timer.end_time.tzinfo is None:
+            end_time = timer.end_time.replace(tzinfo=ZoneInfo("UTC"))
+        else:
+            end_time = timer.end_time.astimezone(ZoneInfo("UTC"))
+
+        # Convert to Asia/Singapore timezone
+        end_time = end_time.astimezone(ZoneInfo("Asia/Singapore"))
+
+    return render_template('admin_page.html', form=form, timer=timer, title="Admin Page", end_time=end_time)
 
 @app.route('/admin/page/start', methods=['POST'])
 @login_required
 @admin_required
 def admin_start_auction():
     # You can get duration from a form or use a default
-    duration = int(request.form.get('duration', 5))  # default 5 minutes if not provided
+    duration = int(request.form.get('duration', 120))  # default 5 minutes if not provided
     end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
     # Remove old timers
     Timer.query.delete()

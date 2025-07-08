@@ -207,9 +207,6 @@ def bid():
 ################################################################################################
 # bidding history
 ################################################################################################
-from flask import render_template
-from application import app
-
 @app.route('/bidding', methods=['GET'])
 @login_required
 def bidding():

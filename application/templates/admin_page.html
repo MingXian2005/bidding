@@ -13,11 +13,11 @@
     <h2>Admin Page</h2>
     <form method="POST" action="{{ url_for('admin_start_auction') }}">
         <label for="duration">Auction Duration (minutes):</label>
-        <input type="number" name="duration" id="duration" min="1" value="5" required>
+        <input type="number" name="duration" id="duration" min="1" value="120" required>
         <button type="submit">Start Auction</button>
     </form>
     {% if timer %}
-        <p>Current auction ends at: {{ timer.end_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>Auction ends at: {{ end_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
     {% else %}
         <p>No auction timer set.</p>
     {% endif %}
