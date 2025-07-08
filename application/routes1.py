@@ -189,7 +189,6 @@ def bid():
             })
 
             flash('Your bid has been placed successfully!', 'success')
-            return redirect(url_for('bidding'))
 
     elif form.is_submitted() and auction_over:
         flash('Bidding has ended. You cannot place a bid.', 'danger')

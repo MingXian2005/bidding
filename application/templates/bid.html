@@ -52,31 +52,31 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <h1>                    {% if not auction_started %}
-                    Auction has not started. Timer will start on first bid.<br>
-                    {% else %}
-                    {% if timer %}
-                    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-                    {% endif %}
-                    {% endif %}</h1>
-        <div class="maindiv"
-            >
+        <h1> {% if not auction_started %}
+            Auction has not started. Timer will start on first bid.<br>
+            {% else %}
+            {% if timer %}
+            <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+            {% endif %}
+            {% endif %}
+        </h1>
+        <div class="maindiv">
 
             <div>
-                <div class=class1 >Starting Price: RM${{ "{:,.2f}".format(starting_price)
+                <div class=class1>Starting Price: RM${{ "{:,.2f}".format(starting_price)
                     or "0.00" }}
                 </div>
-                <div class=class1 >Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
+                <div class=class1>Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
                     "0.00" }}
                 </div>
-                
+
                 {% if latest_bid %}
                 <div class="class1 latestbid">
                     <strong>Your Latest Bid:</strong>
                     RM${{ "{:,.2f}".format(latest_bid.amount) }}
                     at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                     {% if user_rank == 1 %}
-                        Rank: 👑
+                    Rank: 👑
 
                     {% endif %}
                 </div>
@@ -93,7 +93,7 @@
                     No bids yet
                     {% endif %}
                 </div>
-                <form method="POST" action="{{ url_for('bid') }}">
+                <form id="bid-form" method="POST" action="{{ url_for('bid') }}">
                     {{ form.hidden_tag() }}
                     <p>
                         {{ form.amount.label }}<br>
@@ -105,7 +105,6 @@
 
                     <p>
                         <input type="submit" id="bid-btn" value="Place Bid">
-                        <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
             </div>
@@ -137,6 +136,14 @@
             updateTimer();
             setInterval(updateTimer, 1000);
         }
+
+
+        document.getElementById('bid-form').onsubmit = function (e) {
+            if (!confirm('Are you sure you want to place this bid?')) {
+                e.preventDefault();
+            }
+        };
+
     </script>
 </body>
 
