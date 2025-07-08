@@ -115,7 +115,7 @@
     <script>
         const timerElement = document.getElementById('timer');
         if (timerElement) {
-            const endTime = new Date(timerElement.dataset.endTime);
+            const endTime = new Date(timerElement.dataset.endTime + "Z");
 
             function updateTimer() {
                 const now = new Date();

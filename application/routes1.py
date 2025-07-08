@@ -97,7 +97,9 @@ def bid():
         if timer.end_time is not None:
             auction_end_time = timer.end_time
             # Ensure timezone awareness
-            auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+            # auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+            auction_end_time = auction_end_time.replace(tzinfo=timezone.utc)
+            auction_end_time = auction_end_time.astimezone(ZoneInfo("Asia/Singapore"))
             time_left = int((auction_end_time - now).total_seconds())
             if time_left <= 0:
                 auction_over = True
@@ -199,8 +201,10 @@ def bid():
         if timer.end_time is not None:
             auction_end_time = timer.end_time
             # Ensure timezone awareness
-            if auction_end_time and auction_end_time.tzinfo is None:
-                auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+            # if auction_end_time and auction_end_time.tzinfo is None:
+            #     auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+            auction_end_time = auction_end_time.replace(tzinfo=timezone.utc)
+            auction_end_time = auction_end_time.astimezone(ZoneInfo("Asia/Singapore"))
             time_left = int((auction_end_time - now).total_seconds())
             auction_over = time_left <= 0
         else:
