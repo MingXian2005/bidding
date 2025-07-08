@@ -37,7 +37,7 @@
                 <tr>
                     <th>Rank</th>
                     <th>Identification Key</th>
-                    <th>Bid Amount</th>
+                    <th>Bid Amount (RM$)</th>
                     <th>Timestamp</th>
                 </tr>
             </thead>
@@ -46,7 +46,7 @@
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ bid.user.IdentificationKey }}</td>
-                    <td>{{ bid.amount }}</td>
+                    <td>{{ "{:,.2f}".format(bid.amount) }}</td>
                     <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                 </tr>
                 {% else %}

@@ -159,9 +159,9 @@ def bid():
             flash(f'Your bid must be LOWER than the starting price (S$ {STARTING_PRICE:.2f}).', 'danger')
         elif bid_value >= STARTING_PRICE - Decrement: 
             flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
-        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount: 
+        elif lowest_bid_amount is not None and bid_value > lowest_bid_amount: 
             flash(f'Your bid must be LOWER than the current lowest bid (S$ {lowest_bid_amount:.2f}).', 'danger')
-        elif lowest_bid_amount is not None and bid_value >= lowest_bid_amount - Decrement: 
+        elif lowest_bid_amount is not None and bid_value > lowest_bid_amount - Decrement: 
             flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
         elif bid_value < 0.01:
             flash('Your bid must be at least S$ 0.01.', 'danger')
