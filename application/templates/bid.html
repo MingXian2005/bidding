@@ -37,8 +37,8 @@
 
 <body>
     <div class="navbar">
-        <a href="{{ url_for('bidding') }}">Bidding</a>
-        <a href="{{ url_for('bid') }}" class="active">Bid</a>
+        <a href="{{ url_for('bid') }}" class="active">Home</a>
+        <a href="{{ url_for('bidding') }}">Bid History</a>
         <div class="navbar-right">
             <a href="{{ url_for('logout') }}">Logout</a>
         </div>
@@ -52,44 +52,37 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <h1>Place a Bid</h1>
-        <div
-            style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px;">
-            <!-- Left: Image -->
-            <div style="flex: 1; max-width: 380px;">
-                <img src="{{ url_for('static', filename='uploads/project.jpeg') }}" alt="Auction Item"
-                    style="width: 100%; border: 1px solid #ccc; border-radius: 8px;">
-            </div>
-            <!-- Right: Info, timer, form -->
-            <div style="flex: 2; max-width: 350px; justify-content: center; margin-right: 40px;">
-                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">Starting Price: S$ {{ starting_price
-                    or "0.00" }}
-                </div>
-                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">Min Lot Decrement: S$ {{ decrement or
-                    "0.00" }}
-                </div>
-                <div class=class1 style="font-size: 1.2em; color: #d9534f; margin-bottom: 15px;">
-                    {% if not auction_started %}
+        <h1>                    {% if not auction_started %}
                     Auction has not started. Timer will start on first bid.<br>
                     {% else %}
                     {% if timer %}
                     <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
                     {% endif %}
-                    {% endif %}
+                    {% endif %}</h1>
+        <div class="maindiv"
+            >
+
+            <div>
+                <div class=class1 >Starting Price: S$ {{ starting_price
+                    or "0.00" }}
                 </div>
+                <div class=class1 >Min Lot Decrement: S$ {{ decrement or
+                    "0.00" }}
+                </div>
+                
                 {% if latest_bid %}
-                <div class=class1 style="margin-bottom: 10px;">
+                <div class="class1 latestbid">
                     <strong>Your Latest Bid:</strong>
                     S$ {{ "%.2f"|format(latest_bid.amount) }}
                     at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                     Rank: {{ user_rank }}
                 </div>
                 {% else %}
-                <div class=class1 style="margin-bottom: 10px;">
+                <div class="class1 latestbid">
                     <strong>No latest bid done by you yet.</strong>
                 </div>
                 {% endif %}
-                <div class=class1 style="font-weight: bold; margin-bottom: 10px;">
+                <div class="class1 lowestbid">
                     Lowest Current Bid:
                     {% if lowest_bidding %}
                     S$ {{ "%.2f"|format(lowest_bidding) }}

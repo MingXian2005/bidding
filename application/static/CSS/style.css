@@ -1,115 +1,91 @@
+@font-face {
+    font-family: 'Cal Sans';
+    src: url('CalSans-Regular.eot');
+    src: local('Cal Sans Regular'), local('CalSans-Regular'),
+        url('CalSans-Regular.eot?#iefix') format('embedded-opentype'),
+        url('CalSans-Regular.woff2') format('woff2'),
+        url('CalSans-Regular.woff') format('woff'),
+        url('CalSans-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Liberal Condensed';
+    src: url('LiberalCondensed-Regular.eot');
+    src: local('Liberal Condensed Regular'), local('LiberalCondensed-Regular'),
+        url('LiberalCondensed-Regular.eot?#iefix') format('embedded-opentype'),
+        url('LiberalCondensed-Regular.woff2') format('woff2'),
+        url('LiberalCondensed-Regular.woff') format('woff'),
+        url('LiberalCondensed-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Liter';
+    src: url('Liter-Regular.eot');
+    src: local('Liter Regular'), local('Liter-Regular'),
+        url('Liter-Regular.eot?#iefix') format('embedded-opentype'),
+        url('Liter-Regular.woff2') format('woff2'),
+        url('Liter-Regular.woff') format('woff'),
+        url('Liter-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
 
 body {
-    font-family: sans-serif;
-    margin: 0;
-    padding-top: 70px; /* Add padding to body to avoid content being hidden by navbar */
-    background-color: #f4f4f4;
+    display: block;
+    margin-left: 80px;
+    margin-right: 80px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    font-family: 'Liter';
 }
 
+/* Basic styling for the navbar container */
 .navbar {
-    background-color: #333;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
     overflow: hidden;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
+    border-bottom: 1px solid #ccc; /* Underline for the whole bar */
 }
 
+/* Style for the links inside the navbar */
 .navbar a {
     float: left;
     display: block;
-    color: #f2f2f2;
+    color: black;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
     font-size: 17px;
+    border-right: 1px solid #ccc;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    position: relative;
+    top: -1px; /* Lifts the tabs up slightly */
+    margin: 0 2px;
 }
 
+/* Change color on hover */
 .navbar a:hover {
     background-color: #ddd;
-    color: black;
 }
 
+/* Style for the active/current link */
 .navbar a.active {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    color: #333;
+    font-weight: bold;
 }
 
+/* Right-aligned links */
 .navbar-right {
     float: right;
-}
-
-.container {
-    max-width: 80%;
-    margin: 20px auto; /* Adjusted margin for container */
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h1, h2 {
-    text-align: center;
-    color: #333;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    padding-left: 50px;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="submit"] {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 100%;
-    max-width: 400px;
-}
-
-input[type="submit"] {
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-    border: none;
-}
-
-input[type="submit"]:hover {
-    background-color: #45a049;
-}
-
-.alert {
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.alert-success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background-color: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.05);
 }
 
 table {
@@ -128,11 +104,34 @@ th {
     background-color: #f2f2f2;
 }
 
-.class1 {
-    padding-left: 50px;
+h1 {
+    text-align: center;
+    font-size: 3em;
 }
 
-.class2 {
-    text-align: right;
-    padding-right: 20px;
+.maindiv > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.maindiv .class1, .maindiv form {
+    width: 48%;
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1.2em;
+}
+
+
+.maindiv .lowestbid {
+  font-size: 1.5em;
+  color: rgb(241, 15, 15);
+}
+
+.maindiv .latestbid {
+  font-size: 1.5em;
+  color: rgb(43, 20, 218);
 }
