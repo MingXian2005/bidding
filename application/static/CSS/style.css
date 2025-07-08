@@ -36,11 +36,24 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Inter';
+    src: url('Inter-Regular.eot');
+    src: local('Inter Regular'), local('Inter-Regular'),
+        url('Inter-Regular.eot?#iefix') format('embedded-opentype'),
+        url('Inter-Regular.woff2') format('woff2'),
+        url('Inter-Regular.woff') format('woff'),
+        url('Inter-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     display: block;
     margin: 0 auto; /* this centers the body horizontally */
     width: 80%; 
-    font-family: 'Liter';
+    font-family:  Helvetica, Arial, sans-serif;;
 }
 
 /* Basic styling for the navbar container */
