@@ -63,7 +63,7 @@
             >
 
             <div>
-                <div class=class1 >Starting Price: RM${{ "{:,.2f}".format(starting_price)
+                <div class="class1 padleft" >Starting Price: RM${{ "{:,.2f}".format(starting_price)
                     or "0.00" }}
                 </div>
                 <div class=class1 >Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
@@ -71,7 +71,7 @@
                 </div>
                 
                 {% if latest_bid %}
-                <div class="class1 latestbid">
+                <div class="class1 latestbid padleft">
                     <strong>Your Latest Bid:</strong>
                     RM${{ "{:,.2f}".format(latest_bid.amount) }}
                     {% if user_rank == 1 %}
@@ -80,7 +80,7 @@
                     {% endif %}
                 </div>
                 {% else %}
-                <div class="class1 latestbid">
+                <div class="class1 latestbid padleft">
                     <strong>No latest bid done by you yet.</strong>
                 </div>
                 {% endif %}
@@ -92,7 +92,7 @@
                     No bids yet
                     {% endif %}
                 </div>
-                <form method="POST" action="{{ url_for('bid') }}">
+                <form method="POST" action="{{ url_for('bid') }}" class="padleft">
                     {{ form.hidden_tag() }}
                     <p>
                         {{ form.amount.label }}<br>
