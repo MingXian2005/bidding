@@ -191,7 +191,6 @@ def bid():
             })
 
             flash('Your bid has been placed successfully!', 'success')
-            return redirect(url_for('bidding'))
 
     elif form.is_submitted() and auction_over:
         flash('Bidding has ended. You cannot place a bid.', 'danger')
@@ -243,7 +242,19 @@ from application import app
 def bidding():
     bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
     timer = Timer.query.order_by(Timer.id.desc()).first()
-    end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+    # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+    if timer and timer.end_time:
+        end_time_iso_utc = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+        end_time_iso = end_time_iso_utc.astimezone(ZoneInfo("Asia/Singapore"))
+    else:
+         end_time_iso = None
+
+    # Convert bid timestamps from UTC to SG
+    for bid in bids:
+        if bid.timestamp:
+            utc_ts = bid.timestamp.replace(tzinfo=ZoneInfo('UTC'))
+            bid.timestamp_sg = utc_ts.astimezone(ZoneInfo("Asia/Singapore"))
+
     return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
 
 ##############################################################################################

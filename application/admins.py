@@ -51,12 +51,21 @@ def admin_register():
 def admin_page():
     form = TimerForm()
     timer = Timer.query.order_by(Timer.id.desc()).first()
+
+    if timer and timer.end_time:
+        timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+        timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
+    else:
+        timer.end_time = None
+    
     if form.validate_on_submit():
         duration = form.duration.data  # duration in minutes
         end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+
         # Remove old timers if you want only one active
         Timer.query.delete()
         db.session.commit()
+
         timer = Timer(end_time=end_time)
         db.session.add(timer)
         db.session.commit()

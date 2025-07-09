@@ -30,8 +30,8 @@
     <div class="container">
         <h1>Bidding Rankings</h1>
         {% if timer %}
-        <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-        {% endif %}
+        <div id="timer" data-end-time="{{ end_time_iso.isoformat() }}"></div> <!--timer.end_time changed -->
+        {% endif %}     
         <table>
             <thead>
                 <tr>
@@ -47,7 +47,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ bid.user.IdentificationKey }}</td>
                     <td>{{ "{:,.2f}".format(bid.amount) }}</td>
-                    <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ bid.timestamp_sg.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- bid.timestamp_sg changed -->
                 </tr>
                 {% else %}
                 <tr>

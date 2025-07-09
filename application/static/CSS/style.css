@@ -124,25 +124,29 @@ h1 {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
 }
 
 .maindiv .class1, .maindiv form {
     width: 48%;
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+    margin-top: 25px;
+    margin-bottom: 40px;
     box-sizing: border-box;
-    font-size: 1.2em;
+    font-size: 1.5em;
 }
 
+.maindiv .padleft {
+    padding-left: 20px;
+}
 
 .maindiv .lowestbid {
-  font-size: 1.5em;
+  font-size: 1.7em; 
   color: rgb(241, 15, 15);
 }
 
 .maindiv .latestbid {
-  font-size: 1.5em;
+  font-size: 1.7em;
   color: rgb(43, 20, 218);
 }
