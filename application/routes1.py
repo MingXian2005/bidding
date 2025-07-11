@@ -165,13 +165,12 @@ def bid():
         elif auction_end_time is None:
             flash('No active auction yet.', 'danger')
         else:
-            auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
             # Extend time if <= 2 minutes left
             if time_left <= 120:
-                print(AUCTION_EXTENSION)
                 auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
                 timer.end_time = auction_end_time
-                print()
+                db.session.add(timer)
+                socketio.emit('timer_extended', {'end_time': auction_end_time.astimezone(timezone.utc).isoformat()})
 
             # Save bid
             new_bid = Bid(amount=bid_value, user=current_user)

@@ -136,7 +136,36 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+            const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+            const timerElement = document.getElementById('timer');
+            let timerInterval;
+
+            function updateTimer(endTime) {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+
+                function frame() {
+                    const now = new Date();
+                    const timeLeft = endTime - now;
+
+                    if (timeLeft < 0) {
+                        timerElement.innerHTML = "Bidding has ended!";
+                        clearInterval(timerInterval);
+                        return;
+                    }
+
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+
+                timerInterval = setInterval(frame, 1000);
+                frame(); // Initial call to display timer immediately
+            }
 
             socket.on('new_bid', function(data) {
                 var tableBody = document.querySelector("#bids-table tbody");
@@ -145,33 +174,17 @@
                    '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
                    '<td>' + data.timestamp + '</td>';
             });
-        });
-    </script>
-    <script>
-        const timerElement = document.getElementById('timer');
-        if (timerElement) {
-            const endTime = new Date(timerElement.dataset.endTime + "Z");
 
-            function updateTimer() {
-                const now = new Date();
-                const timeLeft = endTime - now;
+            socket.on('timer_extended', function(data) {
+                const newEndTime = new Date(data.end_time);
+                updateTimer(newEndTime);
+            });
 
-                if (timeLeft < 0) {
-                    timerElement.innerHTML = "Bidding has ended!";
-                    return;
-                }
-
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            if (timerElement && timerElement.dataset.endTime) {
+                const initialEndTime = new Date(timerElement.dataset.endTime + "Z");
+                updateTimer(initialEndTime);
             }
-
-            updateTimer();
-            setInterval(updateTimer, 1000);
-        }
+        });
     </script>
 </body>
 
