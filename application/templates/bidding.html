@@ -1,69 +1,90 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Bidding Page</title>
-    <meta http-equiv="refresh" content="10">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script> -->
-    <link rel="stylesheet" href="../static/CSS/bidding.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on('new_bid', function (data) {
+            // Option 1: Reload the page (simple)
+            location.reload();
+
+            // Option 2: Or, update the table dynamically (advanced)
+            // You can fetch new bids via AJAX and update the table here
+        });
+    </script>
 </head>
+
 <body>
-    <h1>Bidding Rankings</h1>
-    {% if timer %}
-    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-    {% endif %}
-    <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-            <tr>
-                <th>Rank</th>
-                <th>Identification Key</th>
-                <th>Bid Amount</th>
-                <th>Timestamp</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for bid in bids %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ bid.user.IdentificationKey }}</td>
-                <td>{{ bid.amount }}</td>
-                <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4">No bids found.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a class="btn" href="/bid" role="button">Bid</a>
+    <div class="navbar">
+        <a href="{{ url_for('bid') }}">Home</a>
+        <a href="{{ url_for('bidding') }}" class="active">Bid History</a>
+        <div class="navbar-right">
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
 
-<script>
-    const timerElement = document.getElementById('timer');
-    if (timerElement) {
-        const endTime = new Date(timerElement.dataset.endTime + 'Z');
+    <div class="container">
+        <h1>Bidding Rankings</h1>
+        {% if timer %}
+        <div id="timer" data-end-time="{{ end_time_iso.isoformat() }}"></div> <!--timer.end_time changed -->
+        {% endif %}     
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Company</th>
+                    <th>Bid Amount (RM$)</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bid in bids %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ bid.user.display_name }}</td>
+                    <td>{{ "{:,.2f}".format(bid.amount) }}</td>
+                    <td>{{ bid.timestamp_sg.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- bid.timestamp_sg changed -->
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">No bids found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/bid" class="btn"
+            style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-align: center; text-decoration: none; border-radius: 5px;">Bid</a>
+    </div>
+    <script>
+        const timerElement = document.getElementById('timer');
+        if (timerElement) {
+            const endTime = new Date(timerElement.dataset.endTime);
 
-        function updateTimer() {
-            const now = new Date();
-            const timeLeft = endTime - now;
+            function updateTimer() {
+                const now = new Date();
+                const timeLeft = endTime - now;
 
-            if (timeLeft < 0) {
-                timerElement.innerHTML = "Bidding has ended!";
-                return;
+                if (timeLeft < 0) {
+                    timerElement.innerHTML = "Bidding has ended!";
+                    return;
+                }
+
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
             }
 
-            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+            updateTimer();
+            setInterval(updateTimer, 1000);
         }
-
-        updateTimer();
-        setInterval(updateTimer, 1000);
-    }
-</script>
+    </script>
 </body>
-</html>
 
+</html>

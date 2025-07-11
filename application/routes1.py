@@ -69,6 +69,9 @@ def logout():
 @app.route('/bid', methods=['GET', 'POST'])
 @login_required
 def bid():
+    if current_user.is_blocked:
+        return redirect(url_for('bidding'))
+    
     form = BidForm()
     now = datetime.now(ZoneInfo("Asia/Singapore"))
     AUCTION_EXTENSION = 60
@@ -118,9 +121,16 @@ def bid():
     decrement = db.session.query(Initials).order_by(Initials.BidDecrement).first()
     Decrement = decrement.BidDecrement if decrement else 0
 
+
     # Get initial bid value
     Starting_price = db.session.query(Initials).order_by(Initials.StartingBid).first()
     STARTING_PRICE = Starting_price.StartingBid if Starting_price else 1000
+
+    # Get the value you to add into form
+    if lowest_bid_amount is not None and lowest_bid_amount > 0:
+        min_bid_amount = lowest_bid_amount - Decrement
+    else:
+        min_bid_amount = STARTING_PRICE - Decrement # or some fallback
 
     # Subquery: get the latest bid timestamp for each user
     latest_bids_subq = (
@@ -195,8 +205,6 @@ def bid():
         if timer.end_time is not None:
             auction_end_time = timer.end_time
             # Ensure timezone awareness
-            # if auction_end_time and auction_end_time.tzinfo is None:
-            #     auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
             auction_end_time = auction_end_time.replace(tzinfo=timezone.utc)
             auction_end_time = auction_end_time.astimezone(ZoneInfo("Asia/Singapore"))
             time_left = int((auction_end_time - now).total_seconds())
@@ -206,9 +214,6 @@ def bid():
         #Set auction_over to True if time_left is less than or equal to zero — otherwise, set it to False.
     else:
         time_left = 0  # default if no timer exists
-    
-    # timer = Timer.query.order_by(Timer.id.desc()).first()
-    # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
 
     return render_template(
         'bid.html',
@@ -223,6 +228,7 @@ def bid():
         user_rank=user_rank,
         ranking=ranking,
         decrement=Decrement,
+        min_bid_amount=min_bid_amount,
         lowest_bidding = lowest_bid_amount
     )
 
