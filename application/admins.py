@@ -52,12 +52,12 @@ def admin_page():
     form = TimerForm()
     timer = Timer.query.order_by(Timer.id.desc()).first()
 
-    if timer and timer.end_time:
-        timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
-        timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
-    else:
-        timer.end_time = None
-    
+    if timer:
+        if timer.end_time:
+            timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+            timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
+    # No need for `else: timer.end_time = None`
+
     if form.validate_on_submit():
         duration = form.duration.data  # duration in minutes
         end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
@@ -71,7 +71,9 @@ def admin_page():
         db.session.commit()
         flash(f'Auction timer set for {duration} minutes.', 'success')
         return redirect(url_for('admin_page'))
+        
     return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
+
 
 @app.route('/admin/page/start', methods=['POST'])
 @login_required
