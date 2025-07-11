@@ -18,7 +18,16 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+import string
 
+def generate_display_name():
+    # Get all display names already used
+    existing_names = {u.display_name for u in Users.query.all() if u.display_name}
+    for letter in string.ascii_uppercase:
+        name = f"Company {letter}"
+        if name not in existing_names:
+            return name
+    raise Exception("Ran out of company names!")
 
 @app.route('/admin/register', methods=['GET', 'POST'])
 @login_required
@@ -36,7 +45,10 @@ def admin_register():
             flash('IdentificationKey already exists. Please choose a different one.', 'danger')
             return render_template('register.html', form=form, title="Admin Registration")
 
-        new_user = Users(IdentificationKey=IdentificationKey)
+        new_user = Users(
+        IdentificationKey=IdentificationKey,
+        display_name=generate_display_name()  # assign anonymous name
+        )
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()

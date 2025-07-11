@@ -14,6 +14,7 @@ class Users(db.Model, UserMixin):
     IdentificationKey = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(256))
     is_admin = db.Column(db.Boolean, default=False)
+    display_name = db.Column(db.String(80), unique=True)  
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -24,9 +25,12 @@ class Users(db.Model, UserMixin):
 class Bid(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
-    timestamp = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("Asia/Singapore")))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    user = db.relationship('Users', backref=db.backref('bids', lazy=True))
+    timestamp = db.Column(
+        db.DateTime(timezone=True), 
+        default=lambda: datetime.now(ZoneInfo("Asia/Singapore"))
+    )
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # foreign key to Users
+    user = db.relationship('Users', backref=db.backref('bids', lazy=True))       # relationship to Users
 
 class Timer(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -45,7 +45,7 @@
                 {% for bid in bids %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ bid.user.IdentificationKey }}</td>
+                    <td>{{ bid.user.display_name }}</td>
                     <td>{{ "{:,.2f}".format(bid.amount) }}</td>
                     <td>{{ bid.timestamp_sg.strftime('%Y-%m-%d %H:%M:%S') }}</td> <!-- bid.timestamp_sg changed -->
                 </tr>
@@ -63,7 +63,7 @@
         const timerElement = document.getElementById('timer');
         if (timerElement) {
             const endTime = new Date(timerElement.dataset.endTime);
-            
+
             function updateTimer() {
                 const now = new Date();
                 const timeLeft = endTime - now;
