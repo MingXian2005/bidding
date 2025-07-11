@@ -15,6 +15,7 @@ class Users(db.Model, UserMixin):
     password_hash = db.Column(db.String(256))
     is_admin = db.Column(db.Boolean, default=False)
     display_name = db.Column(db.String(80), unique=True)  
+    is_blocked = db.Column(db.Boolean, default=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

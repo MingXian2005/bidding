@@ -142,29 +142,6 @@
             setInterval(updateTimer, 1000);
         }
     </script>
-    <script>
-    const lowestBidding = {{ lowest_bidding | default(0) | float }};
-    const decrement = {{ decrement | default(0) | float }};
-    
-    let minBidAmount;
-    if (lowestBidding > 0) {
-        minBidAmount = lowestBidding - decrement;
-    } else {
-        // Fallback if no bids yet
-        minBidAmount = {{ starting_price | default(1000) | float }};
-    }
-    
-    // Format with 2 decimals
-    minBidAmount = minBidAmount.toFixed(2);
-
-    // Display in HTML
-    document.addEventListener("DOMContentLoaded", function() {
-        const elem = document.getElementById('min-bid-amount');
-        if (elem) {
-        elem.textContent = 'RM$ ' + minBidAmount;
-        }
-    });
-    </script>
 </body>
 
 </html>

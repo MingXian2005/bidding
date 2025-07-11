@@ -126,3 +126,21 @@ def admin_init_post():
         flash('New initials set successfully!', 'success')
         return redirect(url_for('admin_init'))
     return render_template('admin_init.html', form=form, title="Admin Init")
+
+@app.route('/admin/users')
+@login_required
+@admin_required
+def admin_users():
+    users = Users.query.all()
+    return render_template('admin_users.html', users=users)
+
+@app.route('/admin/users/<int:user_id>/toggle_block', methods=['POST'])
+@login_required
+@admin_required
+def toggle_block_user(user_id):
+    user = Users.query.get_or_404(user_id)
+    user.is_blocked = not user.is_blocked
+    db.session.commit()
+    status = 'blocked' if user.is_blocked else 'unblocked'
+    flash(f'User {user.display_name} is now {status}.', 'success')
+    return redirect(url_for('admin_users'))
