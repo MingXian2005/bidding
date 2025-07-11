@@ -214,8 +214,6 @@ def bid():
     else:
         time_left = 0  # default if no timer exists
     
-    # timer = Timer.query.order_by(Timer.id.desc()).first()
-    # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
     bids = Bid.query.order_by(asc(Bid.amount)).all()
 
     return render_template(
