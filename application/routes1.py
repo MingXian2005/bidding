@@ -132,6 +132,12 @@ def bid():
     else:
         min_bid_amount = STARTING_PRICE - Decrement # or some fallback
 
+    # Get max bid you could
+    if lowest_bid_amount is not None and lowest_bid_amount > 0:
+        max_bid_amount = lowest_bid_amount * 0.20
+    else:
+        max_bid_amount = STARTING_PRICE * 0.20  # fallback if no bids yet
+
     # Subquery: get the latest bid timestamp for each user
     latest_bids_subq = (
         db.session.query(
@@ -174,6 +180,8 @@ def bid():
             flash('Your bid must be at least S$ 0.01.', 'danger')
         elif auction_end_time is None:
             flash('No active auction yet.', 'danger')
+        elif bid_value < max_bid_amount:
+            flash(f'Your bid must not exceed 20% of the lowest bid (S$ {max_bid_amount:.2f}).', 'danger')    
         else:
             # Extend time if <= 2 minutes left
             if time_left <= 120:
@@ -230,6 +238,7 @@ def bid():
         ranking=ranking,
         min_bid_amount=min_bid_amount,
         decrement=Decrement,
+        max_bid_amount=max_bid_amount,
         lowest_bidding = lowest_bid_amount,
         bids=bids
     )

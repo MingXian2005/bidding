@@ -109,8 +109,8 @@
                     </p>
                 </form>
                 <div class="class1 atleast">
-                    You need to bid least:
-                    RM$ {{ "{:,.2f}".format(min_bid_amount) }}
+                    You need to bid between:<br>
+                    Min: RM$ {{ "{:,.2f}".format(min_bid_amount) }} - Max: RM$ {{ "{:,.2f}".format(max_bid_amount) }} <br>
                 </div>
             </div>
         </div>
@@ -172,15 +172,15 @@
                 frame(); // Initial call to display timer immediately
             }
 
-            socket.on('new_bid', function(data) {
+            socket.on('new_bid', function (data) {
                 var tableBody = document.querySelector("#bids-table tbody");
                 var newRow = tableBody.insertRow(0);
                 newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
-                   '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
-                   '<td>' + data.timestamp + '</td>';
+                    '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
+                    '<td>' + data.timestamp + '</td>';
             });
 
-            socket.on('timer_extended', function(data) {
+            socket.on('timer_extended', function (data) {
                 const newEndTime = new Date(data.end_time);
                 updateTimer(newEndTime);
             });
