@@ -175,13 +175,12 @@ def bid():
         elif auction_end_time is None:
             flash('No active auction yet.', 'danger')
         else:
-            auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
             # Extend time if <= 2 minutes left
             if time_left <= 120:
-                print(AUCTION_EXTENSION)
                 auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
                 timer.end_time = auction_end_time
-                print()
+                db.session.add(timer)
+                socketio.emit('timer_extended', {'end_time': auction_end_time.astimezone(timezone.utc).isoformat()})
 
             # Save bid
             new_bid = Bid(amount=bid_value, user=current_user)
@@ -214,6 +213,10 @@ def bid():
         #Set auction_over to True if time_left is less than or equal to zero — otherwise, set it to False.
     else:
         time_left = 0  # default if no timer exists
+    
+    # timer = Timer.query.order_by(Timer.id.desc()).first()
+    # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+    bids = Bid.query.order_by(asc(Bid.amount)).all()
 
     return render_template(
         'bid.html',
@@ -228,8 +231,8 @@ def bid():
         user_rank=user_rank,
         ranking=ranking,
         decrement=Decrement,
-        min_bid_amount=min_bid_amount,
-        lowest_bidding = lowest_bid_amount
+        lowest_bidding = lowest_bid_amount,
+        bids=bids
     )
 
 ################################################################################################

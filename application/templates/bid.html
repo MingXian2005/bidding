@@ -115,32 +115,81 @@
             </div>
         </div>
         <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
+
+        <div class="update-log">
+            <h2>Updates Log</h2>
+            <table id="bids-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bid in bids %}
+                    <tr>
+                        <td>{{ bid.user.IdentificationKey }}</td>
+                        <td>${{ "%.2f"|format(bid.amount) }}</td>
+                        <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
-        const timerElement = document.getElementById('timer');
-        if (timerElement) {
-            const endTime = new Date(timerElement.dataset.endTime + "Z");
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+            const timerElement = document.getElementById('timer');
+            let timerInterval;
 
-            function updateTimer() {
-                const now = new Date();
-                const timeLeft = endTime - now;
-
-                if (timeLeft < 0) {
-                    timerElement.innerHTML = "Bidding has ended!";
-                    return;
+            function updateTimer(endTime) {
+                if (timerInterval) {
+                    clearInterval(timerInterval);
                 }
 
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                function frame() {
+                    const now = new Date();
+                    const timeLeft = endTime - now;
 
-                timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    if (timeLeft < 0) {
+                        timerElement.innerHTML = "Bidding has ended!";
+                        clearInterval(timerInterval);
+                        return;
+                    }
+
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                    timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+
+                timerInterval = setInterval(frame, 1000);
+                frame(); // Initial call to display timer immediately
             }
 
-            updateTimer();
-            setInterval(updateTimer, 1000);
-        }
+            socket.on('new_bid', function(data) {
+                var tableBody = document.querySelector("#bids-table tbody");
+                var newRow = tableBody.insertRow(0);
+                newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
+                   '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
+                   '<td>' + data.timestamp + '</td>';
+            });
+
+            socket.on('timer_extended', function(data) {
+                const newEndTime = new Date(data.end_time);
+                updateTimer(newEndTime);
+            });
+
+            if (timerElement && timerElement.dataset.endTime) {
+                const initialEndTime = new Date(timerElement.dataset.endTime + "Z");
+                updateTimer(initialEndTime);
+            }
+        });
     </script>
 </body>
 
