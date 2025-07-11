@@ -20,11 +20,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 ################################################################################################
-# AUCTION_DURATION = 12 * 60 * 60  # 5 minutes in seconds
-# AUCTION_EXTENSION = 60     # 60 seconds per bid
-# # STARTING_PRICE = 100.00  # or whatever your starting price is
-
-# auction_end_time = None    # Will be set on first bid
 
 ################################################################################################
 #homepage
