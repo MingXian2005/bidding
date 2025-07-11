@@ -18,7 +18,16 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+import string
 
+def generate_display_name():
+    # Get all display names already used
+    existing_names = {u.display_name for u in Users.query.all() if u.display_name}
+    for letter in string.ascii_uppercase:
+        name = f"Company {letter}"
+        if name not in existing_names:
+            return name
+    raise Exception("Ran out of company names!")
 
 @app.route('/admin/register', methods=['GET', 'POST'])
 @login_required
@@ -36,7 +45,10 @@ def admin_register():
             flash('IdentificationKey already exists. Please choose a different one.', 'danger')
             return render_template('register.html', form=form, title="Admin Registration")
 
-        new_user = Users(IdentificationKey=IdentificationKey)
+        new_user = Users(
+        IdentificationKey=IdentificationKey,
+        display_name=generate_display_name()  # assign anonymous name
+        )
         new_user.set_password(password)
         db.session.add(new_user)
         db.session.commit()
@@ -51,18 +63,29 @@ def admin_register():
 def admin_page():
     form = TimerForm()
     timer = Timer.query.order_by(Timer.id.desc()).first()
+
+    if timer:
+        if timer.end_time:
+            timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+            timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
+    # No need for `else: timer.end_time = None`
+
     if form.validate_on_submit():
         duration = form.duration.data  # duration in minutes
         end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+
         # Remove old timers if you want only one active
         Timer.query.delete()
         db.session.commit()
+
         timer = Timer(end_time=end_time)
         db.session.add(timer)
         db.session.commit()
         flash(f'Auction timer set for {duration} minutes.', 'success')
         return redirect(url_for('admin_page'))
+        
     return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
+
 
 @app.route('/admin/page/start', methods=['POST'])
 @login_required

@@ -74,7 +74,6 @@
                 <div class="class1 latestbid padleft">
                     <strong>Your Latest Bid:</strong>
                     RM${{ "{:,.2f}".format(latest_bid.amount) }}
-                    at {{ latest_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
                     {% if user_rank == 1 %}
                         👑
 
@@ -104,7 +103,7 @@
                     </p>
 
                     <p>
-                        <input type="submit" id="bid-btn" value="Place Bid">
+                        <input type="submit" id="bid-btn" value="Place Bid" onclick="return confirm('Are you sure you want to place this bid?');">
                         <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
