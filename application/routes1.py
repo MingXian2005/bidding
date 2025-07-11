@@ -215,6 +215,7 @@ def bid():
     
     # timer = Timer.query.order_by(Timer.id.desc()).first()
     # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+    bids = Bid.query.order_by(asc(Bid.amount)).all()
 
     return render_template(
         'bid.html',
@@ -229,7 +230,8 @@ def bid():
         user_rank=user_rank,
         ranking=ranking,
         decrement=Decrement,
-        lowest_bidding = lowest_bid_amount
+        lowest_bidding = lowest_bid_amount,
+        bids=bids
     )
 
 ################################################################################################

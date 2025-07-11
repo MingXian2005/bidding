@@ -111,7 +111,45 @@
             </div>
         </div>
         <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
+
+        <div class="update-log">
+            <h2>Updates Log</h2>
+            <table id="bids-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Amount</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bid in bids %}
+                    <tr>
+                        <td>{{ bid.user.IdentificationKey }}</td>
+                        <td>${{ "%.2f"|format(bid.amount) }}</td>
+                        <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+            socket.on('new_bid', function(data) {
+                var tableBody = document.querySelector("#bids-table tbody");
+                var newRow = tableBody.insertRow(0);
+                newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
+                                   '<td>
+
+</html> + parseFloat(data.amount).toFixed(2) + '</td>' +
+                                   '<td>' + data.timestamp + '</td>';
+            });
+        });
+    </script>
     <script>
         const timerElement = document.getElementById('timer');
         if (timerElement) {
