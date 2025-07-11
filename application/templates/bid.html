@@ -52,30 +52,30 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <h1>                    {% if not auction_started %}
-                    Auction has not started. Timer will start on first bid.<br>
-                    {% else %}
-                    {% if timer %}
-                    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-                    {% endif %}
-                    {% endif %}</h1>
-        <div class="maindiv"
-            >
+        <h1> {% if not auction_started %}
+            Auction has not started. Timer will start on first bid.<br>
+            {% else %}
+            {% if timer %}
+            <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+            {% endif %}
+            {% endif %}
+        </h1>
+        <div class="maindiv">
 
             <div>
-                <div class="class1 padleft" >Starting Price: RM${{ "{:,.2f}".format(starting_price)
+                <div class="class1 padleft">Starting Price: RM${{ "{:,.2f}".format(starting_price)
                     or "0.00" }}
                 </div>
-                <div class=class1 >Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
+                <div class=class1>Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
                     "0.00" }}
                 </div>
-                
+
                 {% if latest_bid %}
                 <div class="class1 latestbid padleft">
                     <strong>Your Latest Bid:</strong>
                     RM${{ "{:,.2f}".format(latest_bid.amount) }}
                     {% if user_rank == 1 %}
-                        👑
+                    👑
 
                     {% endif %}
                 </div>
@@ -103,10 +103,15 @@
                     </p>
 
                     <p>
-                        <input type="submit" id="bid-btn" value="Place Bid" onclick="return confirm('Are you sure you want to place this bid?');">
+                        <input type="submit" id="bid-btn" value="Place Bid"
+                            onclick="return confirm('Are you sure you want to place this bid?');">
                         <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
+                <div class="class1 atleast">
+                    You need to bid least:
+                    RM$ {{ "{:,.2f}".format(min_bid_amount) }}
+                </div>
             </div>
         </div>
         <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
@@ -136,6 +141,29 @@
             updateTimer();
             setInterval(updateTimer, 1000);
         }
+    </script>
+    <script>
+    const lowestBidding = {{ lowest_bidding | default(0) | float }};
+    const decrement = {{ decrement | default(0) | float }};
+    
+    let minBidAmount;
+    if (lowestBidding > 0) {
+        minBidAmount = lowestBidding - decrement;
+    } else {
+        // Fallback if no bids yet
+        minBidAmount = {{ starting_price | default(1000) | float }};
+    }
+    
+    // Format with 2 decimals
+    minBidAmount = minBidAmount.toFixed(2);
+
+    // Display in HTML
+    document.addEventListener("DOMContentLoaded", function() {
+        const elem = document.getElementById('min-bid-amount');
+        if (elem) {
+        elem.textContent = 'RM$ ' + minBidAmount;
+        }
+    });
     </script>
 </body>
 
