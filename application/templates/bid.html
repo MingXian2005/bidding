@@ -142,10 +142,8 @@
                 var tableBody = document.querySelector("#bids-table tbody");
                 var newRow = tableBody.insertRow(0);
                 newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
-                                   '<td>
-
-</html> + parseFloat(data.amount).toFixed(2) + '</td>' +
-                                   '<td>' + data.timestamp + '</td>';
+                   '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
+                   '<td>' + data.timestamp + '</td>';
             });
         });
     </script>
