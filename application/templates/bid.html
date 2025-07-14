@@ -124,24 +124,14 @@
 
         <div class="update-log">
             <h2>Updates Log</h2>
-            <table id="bids-table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Amount</th>
-                        <th>Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for bid in bids %}
-                    <tr>
-                        <td>{{ bid.user.IdentificationKey }}</td>
-                        <td>RM${{ "{:,.2f}".format(bid.amount) }}</td>
-                        <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div id="bids-log">
+                {% for bid in bids %}
+                <div class="log-entry">
+                    {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}: 
+                    User {{ bid.user.IdentificationKey }} bidded RM${{ "{:,.2f}".format(bid.amount) }}
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
     <script>
@@ -182,27 +172,31 @@
             }
 
             socket.on('new_bid', function(data) {
-                var tableBody = document.querySelector("#bids-table tbody");
-                var newRow = tableBody.insertRow(0);
+                const logContainer = document.getElementById("bids-log");
+                if (logContainer) {
+                    const logEntry = document.createElement("div");
+                    logEntry.className = "log-entry";
+
+                    const formattedAmount4 = parseFloat(data.amount).toLocaleString('en-SG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+
+                    logEntry.innerText = `${data.timestamp}: User ${data.IdentificationKey} bidded RM$${formattedAmount4}`;
+                    logContainer.prepend(logEntry); // insert at the top
+                }
 
                 var formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
 
-                newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
-                   '<td>RM$' + formattedAmount + '</td>' +
-                   '<td>' + data.timestamp + '</td>';
 
-                const formattedAmount2 = parseFloat(data.amount).toLocaleString('en-SG', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
 
                 // Update Lowest Current Bid
                 const lowestBidDiv = document.getElementById("lowest-bid");
                 if (lowestBidDiv) {
-                    lowestBidDiv.innerHTML = "Lowest Current Bid: RM$" + formattedAmount2;
+                    lowestBidDiv.innerHTML = "Lowest Current Bid: RM$" + formattedAmount;
                 } 
                 // else {
                 //     lowestBidDiv.innerHTML = "Lowest Current Bid: No bids yet";
