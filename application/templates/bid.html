@@ -95,7 +95,7 @@
                 <div class="Rside lowestbid" id="lowest-bid">
                     Lowest Current Bid:
                     {% if lowest_bidding %}
-                    RM$ {{ "{:,.2f}".format(lowest_bidding) }}
+                    RM${{ "{:,.2f}".format(lowest_bidding) }}
                     {% else %}
                     No bids yet
                     {% endif %}
@@ -104,7 +104,7 @@
                     {{ form.hidden_tag() }}
                     <p>
                         {{ form.amount.label }}. You need to bid least:
-                        <span id="min-bid">RM$ {{ "{:,.2f}".format(min_bid_amount) }}</span><br>
+                        <span id="min-bid">RM${{ "{:,.2f}".format(min_bid_amount) }}</span><br>
                         {{ form.amount(size=20) }}<br>
                         {% for error in form.amount.errors %}
                         <span style="color: red;">{{ error }}</span><br>
@@ -202,7 +202,7 @@
                 // Update Lowest Current Bid
                 const lowestBidDiv = document.getElementById("lowest-bid");
                 if (lowestBidDiv) {
-                    lowestBidDiv.innerHTML = "Lowest Current Bid: RM$ " + formattedAmount2;
+                    lowestBidDiv.innerHTML = "Lowest Current Bid: RM$" + formattedAmount2;
                 } 
                 // else {
                 //     lowestBidDiv.innerHTML = "Lowest Current Bid: No bids yet";
@@ -229,7 +229,7 @@
                 // Update Lowest Current Bid
                 const MinBidAmount = document.getElementById("min-bid");
                 if (MinBidAmount) {
-                    MinBidAmount.innerHTML = "RM$ " + formattedAmount3;
+                    MinBidAmount.innerHTML = "RM$" + formattedAmount3;
                 } 
             });
 

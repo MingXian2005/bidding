@@ -25,6 +25,7 @@ class LoginForm(FlaskForm):
 
 class TimerForm(FlaskForm):
     duration = IntegerField('Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
+    extra_duration = IntegerField('Extra Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
     submit = SubmitField('Set Timer')
 
 

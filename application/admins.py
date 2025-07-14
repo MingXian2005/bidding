@@ -71,29 +71,40 @@ def admin_register():
 @admin_required
 def admin_page():
     form = TimerForm()
-    timer = Timer.query.order_by(Timer.id.desc()).first()
+    # timer = Timer.query.order_by(Timer.id.desc()).first()
 
-    if timer:
-        if timer.end_time:
-            timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
-            timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
-    # No need for `else: timer.end_time = None`
+    # if timer:
+    #     if timer.end_time:
+    #         timer.end_time = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+    #         timer.end_time = timer.end_time.astimezone(ZoneInfo("Asia/Singapore"))
+    # # No need for `else: timer.end_time = None`
 
-    if form.validate_on_submit():
-        duration = form.duration.data  # duration in minutes
-        end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+    # if timer:
+    #     if timer.force_end_time:
+    #         timer.force_end_time = timer.force_end_time.replace(tzinfo=ZoneInfo('UTC'))
+    #         timer.force_end_time = timer.force_end_time.astimezone(ZoneInfo("Asia/Singapore"))
 
-        # Remove old timers if you want only one active
-        Timer.query.delete()
-        db.session.commit()
+    # if form.validate_on_submit():
+    #     duration = form.duration.data  # duration in minutes
+    #     extra_duration = form.extra_duration.data
+    #     end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+    #     force_end_time = end_time + timedelta(minutes=extra_duration)
 
-        timer = Timer(end_time=end_time)
-        db.session.add(timer)
-        db.session.commit()
-        flash(f'Auction timer set for {duration} minutes.', 'success')
-        return redirect(url_for('admin_page'))
+    #     print("admin timer setting")
+    #     print(end_time, 'end time')
+    #     print(force_end_time, 'force end time')
+
+    #     # Remove old timers if you want only one active
+    #     Timer.query.delete()
+    #     db.session.commit()
+
+    #     timer = Timer(end_time=end_time, force_end_time=force_end_time)
+    #     db.session.add(timer)
+    #     db.session.commit()
+    #     flash(f'Auction timer set for {duration} minutes and force ends after an additional {extra_duration}.', 'success')
+    #     return redirect(url_for('admin_page'))
         
-    return render_template('admin_page.html', form=form, timer=timer, title="Admin Page")
+    return render_template('admin_page.html', form=form, title="Admin Page")
 
 
 @app.route('/admin/page/start', methods=['POST'])
@@ -102,14 +113,20 @@ def admin_page():
 def admin_start_auction():
     # You can get duration from a form or use a default
     duration = int(request.form.get('duration', 5))  # default 5 minutes if not provided
+    extra_duration = int(request.form.get('extra_duration', 5))  # default 5 minutes if not provided
+    total_extra_duration = extra_duration + duration
     end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
+    force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=total_extra_duration)
+    print("admin timer setting")
+    print(end_time, 'end time')
+    print(force_end_time, 'force end time')
     # Remove old timers
     Timer.query.delete()
     db.session.commit()
-    timer = Timer(end_time=end_time)
+    timer = Timer(end_time=end_time, force_end_time=force_end_time)
     db.session.add(timer)
     db.session.commit()
-    flash(f'Auction started for {duration} minutes.', 'success')
+    flash(f'Auction timer set for {duration} minutes and force ends after an additional {extra_duration}.', 'success')
     return redirect(url_for('admin_page'))
 
 @app.route('/admin/init', methods=['GET', 'POST'])

@@ -175,8 +175,17 @@ def bid():
         elif auction_end_time is None:
             flash('No active auction yet.', 'danger')
         else:
+            # Get force end time
+            timer2 = Timer.query.order_by(Timer.id.desc()).first()
+            auction_force_end_time =timer2.force_end_time
+            auction_force_end_time = auction_force_end_time.replace(tzinfo=timezone.utc)
+            auction_force_end_time = auction_force_end_time.astimezone(ZoneInfo("Asia/Singapore"))
+            auction_end_time2 = timer2.end_time
+            auction_end_time2 = auction_end_time2.replace(tzinfo=timezone.utc)
+            auction_end_time2 = auction_end_time2.astimezone(ZoneInfo("Asia/Singapore"))
+            force_end_time_left = int((auction_force_end_time - auction_end_time2).total_seconds())
             # Extend time if <= 2 minutes left
-            if time_left <= 120:
+            if time_left <= 120 and force_end_time_left > 0:
                 auction_end_time += timedelta(seconds=AUCTION_EXTENSION)
                 timer.end_time = auction_end_time
                 db.session.add(timer)

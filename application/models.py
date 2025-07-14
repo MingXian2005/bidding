@@ -28,7 +28,7 @@ class Bid(db.Model):
     amount = db.Column(db.Float, nullable=False)
     timestamp = db.Column(
         db.DateTime(timezone=True), 
-        default=lambda: datetime.now(ZoneInfo("Asia/Singapore"))
+        default=lambda: datetime.now(ZoneInfo("Asia/Singapore")) 
     )
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # foreign key to Users
     user = db.relationship('Users', backref=db.backref('bids', lazy=True))       # relationship to Users
@@ -36,6 +36,7 @@ class Bid(db.Model):
 class Timer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore")), nullable=False) 
+    force_end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore"))) 
 
 class Initials(db.Model):
     id = db.Column(db.Integer, primary_key=True)
