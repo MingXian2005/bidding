@@ -4,6 +4,7 @@
 <head>
     <title>Place a Bid</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+    
     <!-- <style>
         .bid-container {
             display: flex;
@@ -63,28 +64,35 @@
         <div class="maindiv">
 
             <div>
-                <div class="class1 padleft">Starting Price: RM${{ "{:,.2f}".format(starting_price)
+                <div class="class1">
+                    <img src="../static/uploads/project.jpeg" alt="roject.jpeg">
+                </div>
+                <div class="class1">
+                <div class="Rside">Starting Price: RM${{ "{:,.2f}".format(starting_price)
                     or "0.00" }}
                 </div>
-                <div class=class1>Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
+                <div class="Rside">Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
                     "0.00" }}
                 </div>
 
                 {% if latest_bid %}
-                <div class="class1 latestbid padleft">
+                <div class="Rside latestbid">
                     <strong>Your Latest Bid:</strong>
                     RM${{ "{:,.2f}".format(latest_bid.amount) }}
+                    <span class="close" id="user-rank">
                     {% if user_rank == 1 %}
                     👑 (You are the lowest)
-
+                    {% else %}
+                    &nbsp; <!-- placeholder to ensure the div renders -->
                     {% endif %}
+                    </span>  
                 </div>
                 {% else %}
-                <div class="class1 latestbid padleft">
+                <div class="Rside latestbid Rside">
                     <strong>No latest bid done by you yet.</strong>
                 </div>
                 {% endif %}
-                <div class="class1 lowestbid">
+                <div class="Rside lowestbid" id="lowest-bid">
                     Lowest Current Bid:
                     {% if lowest_bidding %}
                     RM$ {{ "{:,.2f}".format(lowest_bidding) }}
@@ -92,11 +100,11 @@
                     No bids yet
                     {% endif %}
                 </div>
-                <form method="POST" action="{{ url_for('bid') }}" class="padleft">
+                <form method="POST" action="{{ url_for('bid') }}" class="">
                     {{ form.hidden_tag() }}
                     <p>
                         {{ form.amount.label }}. You need to bid least:
-                        RM$ {{ "{:,.2f}".format(min_bid_amount) }}<br>
+                        <span id="min-bid">RM$ {{ "{:,.2f}".format(min_bid_amount) }}</span><br>
                         {{ form.amount(size=20) }}<br>
                         {% for error in form.amount.errors %}
                         <span style="color: red;">{{ error }}</span><br>
@@ -109,10 +117,7 @@
                         <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
-                <!-- <div class="class1 atleast">
-                    You need to bid least:
-                    RM$ {{ "{:,.2f}".format(min_bid_amount) }}
-                </div> -->
+                </div>
             </div>
         </div>
         <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
@@ -131,7 +136,7 @@
                     {% for bid in bids %}
                     <tr>
                         <td>{{ bid.user.IdentificationKey }}</td>
-                        <td>${{ "%.2f"|format(bid.amount) }}</td>
+                        <td>RM${{ "{:,.2f}".format(bid.amount) }}</td>
                         <td>{{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                     </tr>
                     {% endfor %}
@@ -139,6 +144,9 @@
             </table>
         </div>
     </div>
+    <script>
+    const CURRENT_USER_ID = {{ current_user.id }}; // Ignore the syntax error
+    </script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
@@ -176,9 +184,53 @@
             socket.on('new_bid', function(data) {
                 var tableBody = document.querySelector("#bids-table tbody");
                 var newRow = tableBody.insertRow(0);
+
+                var formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
                 newRow.innerHTML = '<td>' + data.IdentificationKey + '</td>' +
-                   '<td>$' + parseFloat(data.amount).toFixed(2) + '</td>' +
+                   '<td>RM$' + formattedAmount + '</td>' +
                    '<td>' + data.timestamp + '</td>';
+
+                const formattedAmount2 = parseFloat(data.amount).toLocaleString('en-SG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                // Update Lowest Current Bid
+                const lowestBidDiv = document.getElementById("lowest-bid");
+                if (lowestBidDiv) {
+                    lowestBidDiv.innerHTML = "Lowest Current Bid: RM$ " + formattedAmount2;
+                } 
+                // else {
+                //     lowestBidDiv.innerHTML = "Lowest Current Bid: No bids yet";
+                // }
+
+                 // Update user rank
+
+                const userRankElement = document.getElementById("user-rank");
+
+                // 👑 Update crown dynamically based on YOUR current rank
+                if (userRankElement) {
+                    if (data.user_id === CURRENT_USER_ID && data.user_rank === 1) {
+                        userRankElement.innerHTML = "👑 (You are the lowest)";
+                    } else {
+                        userRankElement.innerHTML = "&nbsp;"; // remove crown if not lowest anymore
+                    }
+                }
+
+                const formattedAmount3 = parseFloat(data.min_bid_amount).toLocaleString('en-SG', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+
+                // Update Lowest Current Bid
+                const MinBidAmount = document.getElementById("min-bid");
+                if (MinBidAmount) {
+                    MinBidAmount.innerHTML = "RM$ " + formattedAmount3;
+                } 
             });
 
             socket.on('timer_extended', function(data) {

@@ -42,7 +42,7 @@ def auth():
         return redirect(url_for('bid'))
     loginform = LoginForm()
     if loginform.validate_on_submit():
-        user = Users.query.filter_by(IdentificationKey=loginform.IdentificationKey.data).first()
+        user = Users.query.filter_by(display_name=loginform.display_name.data).first()
         if user and user.check_password(loginform.password.data):
             login_user(user)
             flash('Login successful.', 'success')
@@ -187,11 +187,48 @@ def bid():
             db.session.add(new_bid)
             db.session.commit()
 
+            # 🔁 REFRESH lowest bid after bid is committed
+            lowest_bid = db.session.query(Bid).order_by(Bid.amount.asc()).first()
+            lowest_bid_amount = lowest_bid.amount if lowest_bid else None
+
+            bids = Bid.query.order_by(asc(Bid.amount)).all()
+            # Refresh latest_bid and user_rank after the new bid is saved
+            latest_bid = Bid.query.filter_by(user_id=current_user.id).order_by(Bid.timestamp.desc()).first()
+
+            # Rebuild ranking dict if needed
+            latest_bids_subq = (
+                db.session.query(
+                    Bid.user_id,
+                    func.max(Bid.timestamp).label('max_timestamp')
+                )
+                .group_by(Bid.user_id)
+                .subquery()
+            )
+
+            latest_bids = (
+                db.session.query(Bid)
+                .join(latest_bids_subq, (Bid.user_id == latest_bids_subq.c.user_id) & (Bid.timestamp == latest_bids_subq.c.max_timestamp))
+                .order_by(Bid.amount.asc())
+                .all()
+            )
+
+            ranking = {bid.user_id: idx for idx, bid in enumerate(latest_bids, start=1)}
+            user_rank = ranking.get(current_user.id)
+
+            # Get the value you to add into form
+            if new_bid.amount is not None and new_bid.amount > 0:
+                min_bid_amount = new_bid.amount - Decrement
+            else:
+                min_bid_amount = STARTING_PRICE - Decrement # or some fallback
+
             # Emit real-time update
             socketio.emit('new_bid', {
                 'IdentificationKey': new_bid.user.IdentificationKey,
                 'amount': new_bid.amount,
-                'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'user_rank': user_rank,
+                'user_id': current_user.id,
+                'min_bid_amount': min_bid_amount
             })
 
             flash('Your bid has been placed successfully!', 'success')
@@ -217,6 +254,28 @@ def bid():
     # timer = Timer.query.order_by(Timer.id.desc()).first()
     # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
     bids = Bid.query.order_by(asc(Bid.amount)).all()
+    # Refresh latest_bid and user_rank after the new bid is saved
+    latest_bid = Bid.query.filter_by(user_id=current_user.id).order_by(Bid.timestamp.desc()).first()
+
+    # Rebuild ranking dict if needed
+    latest_bids_subq = (
+        db.session.query(
+            Bid.user_id,
+            func.max(Bid.timestamp).label('max_timestamp')
+        )
+        .group_by(Bid.user_id)
+        .subquery()
+    )
+
+    latest_bids = (
+        db.session.query(Bid)
+        .join(latest_bids_subq, (Bid.user_id == latest_bids_subq.c.user_id) & (Bid.timestamp == latest_bids_subq.c.max_timestamp))
+        .order_by(Bid.amount.asc())
+        .all()
+    )
+
+    # ranking = {bid.user_id: idx for idx, bid in enumerate(latest_bids, start=1)}
+    # user_rank = ranking.get(current_user.id)
 
     return render_template(
         'bid.html',

@@ -5,6 +5,7 @@ from wtforms.validators import InputRequired, Length, NumberRange
 class RegistrationForm(FlaskForm):
     IdentificationKey = StringField('Identification Key', validators=[InputRequired(), Length(min=4, max=80)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6, max=120)])
+    display_name = StringField('Display Name', validators=[InputRequired(), Length(min=1, max=80)])
     submit = SubmitField('Register')
 
 
@@ -14,8 +15,8 @@ class BidForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    IdentificationKey = StringField("Identification Key",
-            validators=[InputRequired()], render_kw={"placeholder": "Identification Key"})
+    display_name = StringField('Company Name', 
+            validators=[InputRequired()], render_kw={"placeholder": "Company Name"})
     password = PasswordField("Password",
             validators=[InputRequired()], render_kw={"placeholder": "Password"})
     

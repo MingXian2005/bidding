@@ -28,7 +28,7 @@ with app.app_context():
 
     # Create admin user
     if not Users.query.filter_by(IdentificationKey='admin').first():
-        admin = Users(IdentificationKey='admin', is_admin=True, display_name='Display_Admin')
+        admin = Users(IdentificationKey='admin', is_admin=True, display_name='Administrator')
         admin.set_password('admin')
         db.session.add(admin)
 

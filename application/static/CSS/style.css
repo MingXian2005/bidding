@@ -134,19 +134,40 @@ h1 {
     margin-top: 25px;
     margin-bottom: 40px;
     box-sizing: border-box;
-    font-size: 1.5em;
+    font-size: 1.2em;
 }
 
-.maindiv .padleft {
-    padding-left: 20px;
+.maindiv form {
+    width: 100%;
+    margin-top: 25px;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+    font-size: 1.2em;
+}
+
+.maindiv .class1 img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.maindiv .Rside {
+    font-size: 1.2em;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /* padding-left: 20px; */
 }
 
 .maindiv .lowestbid {
-  font-size: 1.7em; 
+  font-size: 1.5em; 
   color: rgb(241, 15, 15);
 }
 
 .maindiv .latestbid {
-  font-size: 1.7em;
+  font-size: 1.5em;
   color: rgb(43, 20, 218);
+}
+
+.class2 {
+    text-align: right;
 }

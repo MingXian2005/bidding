@@ -29,7 +29,8 @@ def generate_display_name():
             return name
     raise Exception("Ran out of company names!")
 
-@app.route('/admin', methods=['GET', 'POST'])
+@app.route('/admin')
+@app.route('/admin/')
 @login_required
 @admin_required
 
@@ -43,6 +44,7 @@ def admin():
 def admin_register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        display_name = form.display_name.data
         IdentificationKey = form.IdentificationKey.data
         password = form.password.data
         
@@ -54,7 +56,7 @@ def admin_register():
 
         new_user = Users(
         IdentificationKey=IdentificationKey,
-        display_name=generate_display_name()  # assign anonymous name
+        display_name=display_name  # assign anonymous name
         )
         new_user.set_password(password)
         db.session.add(new_user)

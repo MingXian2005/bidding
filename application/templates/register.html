@@ -15,6 +15,10 @@
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         <p>
+            {{ form.display_name.label }}<br>
+            {{ form.display_name(size=32) }}
+        </p>
+        <p>
             {{ form.IdentificationKey.label }}<br>
             {{ form.IdentificationKey(size=32) }}
         </p>
