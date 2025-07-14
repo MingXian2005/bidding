@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Homepage{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="info-section">
+        <h2>Admin Links</h2>
+        <ul>
+            <li><a href="{{ url_for('admin_register') }}">Register New User</a></li>
+            <li><a href="{{ url_for('admin_page') }}">Set Auction Timer</a></li>
+            <li><a href="{{ url_for('admin_init') }}">Set Initial Values</a></li>
+            <li><a href="{{ url_for('admin_users') }}">Manage Users</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

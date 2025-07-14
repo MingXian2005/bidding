@@ -29,6 +29,13 @@ def generate_display_name():
             return name
     raise Exception("Ran out of company names!")
 
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
+@admin_required
+
+def admin():
+    return render_template('admin.html', title="Admin Homepage")
+
 @app.route('/admin/register', methods=['GET', 'POST'])
 @login_required
 @admin_required

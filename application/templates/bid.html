@@ -95,7 +95,8 @@
                 <form method="POST" action="{{ url_for('bid') }}" class="padleft">
                     {{ form.hidden_tag() }}
                     <p>
-                        {{ form.amount.label }}<br>
+                        {{ form.amount.label }}. You need to bid least:
+                        RM$ {{ "{:,.2f}".format(min_bid_amount) }}<br>
                         {{ form.amount(size=20) }}<br>
                         {% for error in form.amount.errors %}
                         <span style="color: red;">{{ error }}</span><br>
@@ -108,10 +109,10 @@
                         <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
                     </p>
                 </form>
-                <div class="class1 atleast">
+                <!-- <div class="class1 atleast">
                     You need to bid least:
                     RM$ {{ "{:,.2f}".format(min_bid_amount) }}
-                </div>
+                </div> -->
             </div>
         </div>
         <p class="class2"><a href="{{ url_for('bidding') }}">Back to Bidding Rankings</a></p>
