@@ -128,7 +128,13 @@
                 {% for bid in bids %}
                 <div class="log-entry">
                     {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}: 
-                    User {{ bid.user.IdentificationKey }} bidded RM${{ "{:,.2f}".format(bid.amount) }}
+                    User 
+                    {% if bid.user.id == current_user.id %}
+                        {{ current_user.display_name }}
+                    {% else %}
+                        {{ bid.user.IdentificationKey }}
+                    {% endif %}
+                    bidded RM${{ "{:,.2f}".format(bid.amount) }}
                 </div>
                 {% endfor %}
             </div>
@@ -182,8 +188,11 @@
                         maximumFractionDigits: 2
                     });
 
-                    logEntry.innerText = `${data.timestamp}: User ${data.IdentificationKey} bidded RM$${formattedAmount4}`;
-                    logContainer.prepend(logEntry); // insert at the top
+                    // Use display_name if it's your own bid
+                    let displayName = (data.user_id === CURRENT_USER_ID) ? data.display_name : data.IdentificationKey;
+
+                    logEntry.innerText = `${data.timestamp}: User ${displayName} bidded RM$${formattedAmount4}`;
+                    logContainer.prepend(logEntry);
                 }
 
                 var formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {

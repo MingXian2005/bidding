@@ -235,6 +235,7 @@ def bid():
                 'IdentificationKey': new_bid.user.IdentificationKey,
                 'amount': new_bid.amount,
                 'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'display_name': new_bid.user.display_name,
                 'user_rank': user_rank,
                 'user_id': current_user.id,
                 'min_bid_amount': min_bid_amount
