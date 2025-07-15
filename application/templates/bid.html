@@ -54,7 +54,11 @@
         {% endif %}
         {% endwith %}
         <h1> {% if not auction_started %}
-            Auction has not started. Timer will start on first bid.<br>
+            {% if desig_auc_strt_time %}
+                Auction has not started. Auction will start on {{ desig_auc_strt_time.isoformat() }}.<br>
+            {% else %}
+                Auction has not started. Auction start time not set.<br>
+            {% endif %}
             {% else %}
             {% if timer %}
             <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>

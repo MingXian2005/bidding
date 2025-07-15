@@ -80,10 +80,20 @@ def bid():
     # Fetch latest timer
     timer = Timer.query.order_by(Timer.id.desc()).first()
     end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+
+    desig_auc_strt_time = None
     if timer is not None:
-        auction_started = True
+        desig_auc_strt_time = timer.start_time
+        desig_auc_strt_time = desig_auc_strt_time.replace(tzinfo=timezone.utc)
+        desig_auc_strt_time = desig_auc_strt_time.astimezone(ZoneInfo("Asia/Singapore"))
+        time_check_desig_start = int((desig_auc_strt_time - now).total_seconds())
+        if time_check_desig_start <= 0:
+            auction_started = True
+        else:
+            auction_started = False
     else:
         auction_started = False
+        desig_auc_strt_time = None
 
     auction_over = False
     auction_end_time = None
@@ -302,7 +312,8 @@ def bid():
         min_bid_amount=min_bid_amount,
         decrement=Decrement,
         lowest_bidding = lowest_bid_amount,
-        bids=bids
+        bids=bids,
+        desig_auc_strt_time=desig_auc_strt_time
     )
 
 ################################################################################################

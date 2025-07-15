@@ -117,13 +117,14 @@ def admin_start_auction():
     total_extra_duration = extra_duration + duration
     end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
     force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=total_extra_duration)
+    start_time = datetime.now(ZoneInfo("Asia/Singapore"))
     print("admin timer setting")
     print(end_time, 'end time')
     print(force_end_time, 'force end time')
     # Remove old timers
     Timer.query.delete()
     db.session.commit()
-    timer = Timer(end_time=end_time, force_end_time=force_end_time)
+    timer = Timer(end_time=end_time, force_end_time=force_end_time, start_time=start_time)
     db.session.add(timer)
     db.session.commit()
     flash(f'Auction timer set for {duration} minutes and force ends after an additional {extra_duration}.', 'success')

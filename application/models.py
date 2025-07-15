@@ -37,6 +37,7 @@ class Timer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore")), nullable=False) 
     force_end_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore"))) 
+    start_time = db.Column(db.DateTime, default=lambda: datetime.now(ZoneInfo("Asia/Singapore"))) 
 
 class Initials(db.Model):
     id = db.Column(db.Integer, primary_key=True)
