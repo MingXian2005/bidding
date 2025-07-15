@@ -55,7 +55,7 @@
         {% endwith %}
         <h1> {% if not auction_started %}
             {% if desig_auc_strt_time %}
-                Auction has not started. Auction will start on {{ desig_auc_strt_time.isoformat() }}.<br>
+                Auction has not started. Auction will start on {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p') }}.<br>
             {% else %}
                 Auction has not started. Auction start time not set.<br>
             {% endif %}

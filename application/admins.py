@@ -3,8 +3,8 @@ from application.models import Users, Timer, Initials
 from flask_login import current_user, login_required
 from functools import wraps
 from flask import render_template, request, flash, redirect, url_for, abort
-from application.forms import RegistrationForm, TimerForm, InitialsForm
-from datetime import datetime, timedelta
+from application.forms import RegistrationForm, TimerForm, InitialsForm, NewTimerForm
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 
@@ -171,3 +171,33 @@ def toggle_block_user(user_id):
     status = 'blocked' if user.is_blocked else 'unblocked'
     flash(f'User {user.display_name} is now {status}.', 'success')
     return redirect(url_for('admin_users'))
+
+@app.route('/admin/start', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_start():
+    form = NewTimerForm()
+    if form.validate_on_submit():
+        start_time = form.start_time.data
+        duration = form.duration.data
+        extra_duration = form.extra_duration.data
+        total_extra_duration = extra_duration
+        start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        end_time = start_time + timedelta(minutes=duration)
+        force_end_time = start_time + timedelta(minutes=total_extra_duration)
+        print(start_time)
+        print(end_time)
+        print(force_end_time)
+        print(datetime.now(ZoneInfo("Asia/Singapore")))
+
+
+        # Remove old timers
+        Timer.query.delete()
+        db.session.commit()
+
+        timer = Timer(start_time=start_time, end_time=end_time, force_end_time=force_end_time)
+        db.session.add(timer)
+        db.session.commit()
+        flash(f'Auction timer set.', 'success')
+        return redirect(url_for('admin_start'))
+    return render_template('admin_start.html', form=form, title="Admin Start")

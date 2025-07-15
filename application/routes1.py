@@ -296,7 +296,12 @@ def bid():
 
     # ranking = {bid.user_id: idx for idx, bid in enumerate(latest_bids, start=1)}
     # user_rank = ranking.get(current_user.id)
-
+    if desig_auc_strt_time == None:
+        print()
+    else:
+        print("desig_auc_strt_time: ")
+        print(desig_auc_strt_time)
+    
     return render_template(
         'bid.html',
         form=form,
@@ -327,20 +332,40 @@ from application import app
 def bidding():
     bids = Bid.query.order_by(asc(Bid.amount)).all()  # Replace `amount` with your column
     timer = Timer.query.order_by(Timer.id.desc()).first()
-    # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
-    if timer and timer.end_time:
-        end_time_iso_utc = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
-        end_time_iso = end_time_iso_utc.astimezone(ZoneInfo("Asia/Singapore"))
+
+    auction_over = False
+    now = datetime.now(ZoneInfo("Asia/Singapore"))
+
+    if timer.end_time is not None:
+        auction_end_time = timer.end_time
+        # Ensure timezone awareness
+        # auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        auction_end_time = auction_end_time.replace(tzinfo=timezone.utc)
+        auction_end_time = auction_end_time.astimezone(ZoneInfo("Asia/Singapore"))
+        time_left = int((auction_end_time - now).total_seconds())
+        if time_left <= 0:
+            auction_over = True
+        else:
+            auction_over = False
+
+    if auction_over == True:
+        # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
+        if timer and timer.end_time:
+            end_time_iso_utc = timer.end_time.replace(tzinfo=ZoneInfo('UTC'))
+            end_time_iso = end_time_iso_utc.astimezone(ZoneInfo("Asia/Singapore"))
+        else:
+            end_time_iso = None
+
+        # Convert bid timestamps from UTC to SG
+        for bid in bids:
+            if bid.timestamp:
+                utc_ts = bid.timestamp.replace(tzinfo=ZoneInfo('UTC'))
+                bid.timestamp_sg = utc_ts.astimezone(ZoneInfo("Asia/Singapore"))
+
+        return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
+    
     else:
-         end_time_iso = None
-
-    # Convert bid timestamps from UTC to SG
-    for bid in bids:
-        if bid.timestamp:
-            utc_ts = bid.timestamp.replace(tzinfo=ZoneInfo('UTC'))
-            bid.timestamp_sg = utc_ts.astimezone(ZoneInfo("Asia/Singapore"))
-
-    return render_template('bidding.html', bids=bids, timer=timer, end_time_iso=end_time_iso)
+        return redirect(url_for('index'))
 
 ##############################################################################################
 @app.route('/reset', methods=['POST', 'GET'])
