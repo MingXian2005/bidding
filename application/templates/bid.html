@@ -4,7 +4,7 @@
 <head>
     <title>Place a Bid</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
-    
+
     <!-- <style>
         .bid-container {
             display: flex;
@@ -55,9 +55,10 @@
         {% endwith %}
         <h1> {% if not auction_started %}
             {% if desig_auc_strt_time %}
-                Auction has not started. Auction will start on {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p') }}.<br>
+            Auction has not started. Auction will start on {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p')
+            }}.<br>
             {% else %}
-                Auction has not started. Auction start time not set.<br>
+            Auction has not started. Auction start time not set.<br>
             {% endif %}
             {% else %}
             {% if timer %}
@@ -72,55 +73,60 @@
                     <img src="../static/uploads/project.jpeg" alt="roject.jpeg">
                 </div>
                 <div class="class1">
-                <div class="Rside">Starting Price: RM${{ "{:,.2f}".format(starting_price)
-                    or "0.00" }}
-                </div>
-                <div class="Rside">Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
-                    "0.00" }}
-                </div>
+                    <div class="Rside">Starting Price: RM${{ "{:,.2f}".format(starting_price)
+                        or "0.00" }}
+                    </div>
+                    <div class="Rside">Min Lot Decrement: RM${{ "{:,.2f}".format(decrement) or
+                        "0.00" }}
+                    </div>
 
-                {% if latest_bid %}
-                <div class="Rside latestbid">
-                    <strong>Your Latest Bid:</strong>
-                    RM${{ "{:,.2f}".format(latest_bid.amount) }}
-                    <span class="close" id="user-rank">
-                    {% if user_rank == 1 %}
-                    👑 (You are the lowest)
+                    {% if latest_bid %}
+                    <div class="Rside latestbid">
+                        <strong>Your Latest Bid:</strong>
+                        RM${{ "{:,.2f}".format(latest_bid.amount) }}
+                        <span class="close" id="user-rank">
+                            {% if user_rank == 1 %}
+                            👑 (You are the lowest)
+                            {% else %}
+                            &nbsp; <!-- placeholder to ensure the div renders -->
+                            {% endif %}
+                        </span>
+                    </div>
                     {% else %}
-                    &nbsp; <!-- placeholder to ensure the div renders -->
+                    <div class="Rside latestbid Rside">
+                        <strong>No latest bid done by you yet.</strong>
+                    </div>
                     {% endif %}
-                    </span>  
-                </div>
-                {% else %}
-                <div class="Rside latestbid Rside">
-                    <strong>No latest bid done by you yet.</strong>
-                </div>
-                {% endif %}
-                <div class="Rside lowestbid" id="lowest-bid">
-                    Lowest Current Bid:
-                    {% if lowest_bidding %}
-                    RM${{ "{:,.2f}".format(lowest_bidding) }}
-                    {% else %}
-                    No bids yet
-                    {% endif %}
-                </div>
-                <form method="POST" action="{{ url_for('bid') }}" class="">
-                    {{ form.hidden_tag() }}
-                    <p>
-                        {{ form.amount.label }}. You need to bid least:
-                        <span id="min-bid">RM${{ "{:,.2f}".format(min_bid_amount) }}</span><br>
-                        {{ form.amount(size=20) }}<br>
-                        {% for error in form.amount.errors %}
-                        <span style="color: red;">{{ error }}</span><br>
-                        {% endfor %}
-                    </p>
+                    <div class="Rside lowestbid" id="lowest-bid">
+                        Lowest Current Bid:
+                        {% if lowest_bidding %}
+                        RM${{ "{:,.2f}".format(lowest_bidding) }}
+                        {% else %}
+                        No bids yet
+                        {% endif %}
+                    </div>
+                    <form method="POST" action="{{ url_for('bid') }}" class="">
+                        {{ form.hidden_tag() }}
+                        <p>
+                            {{ form.amount.label }}. You need to bid least:
+                            <span id="min-bid">RM${{ "{:,.2f}".format(min_bid_amount) }}</span><br>
+                            {{ form.amount(size=20) }}<br>
+                            {% for error in form.amount.errors %}
+                            <span style="color: red;">{{ error }}</span><br>
+                            {% endfor %}
+                        </p>
 
-                    <p>
-                        <input type="submit" id="bid-btn" value="Place Bid"
-                            onclick="return confirm('Are you sure you want to place this bid?');">
-                        <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
-                    </p>
-                </form>
+                        <p>
+                            <input type="submit" id="bid-btn" value="Place Bid"
+                                onclick="return confirm('Are you sure you want to place this bid?');">
+                            <!-- <input type="submit" id="bid-btn" value="Place Bid" {% if auction_over %}disabled{% endif %}> -->
+                        </p>
+                    </form>
+                    <div class="claas1 atleast">
+                        You need to bid between:<br>
+                        Min: <span id="min-bid">RM${{ "{:,.2f}".format(min_bid_amount) }}</span>
+                        - Max: <span id="max-bid">RM${{ "{:,.2f}".format(max_bid_amount) }}</span><br>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,12 +137,12 @@
             <div id="bids-log">
                 {% for bid in bids[:6] %}
                 <div class="log-entry">
-                    {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}: 
-                    User 
+                    {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:
+                    User
                     {% if bid.user.id == current_user.id %}
-                        {{ current_user.display_name }}
+                    {{ current_user.display_name }}
                     {% else %}
-                        {{ bid.user.IdentificationKey }}
+                    {{ bid.user.IdentificationKey }}
                     {% endif %}
                     bidded RM${{ "{:,.2f}".format(bid.amount) }}
                 </div>
@@ -145,7 +151,7 @@
         </div>
     </div>
     <script>
-    const CURRENT_USER_ID = {{ current_user.id }}; // Ignore the syntax error
+        const CURRENT_USER_ID = {{ current_user.id }}; // Ignore the syntax error
     </script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
@@ -181,7 +187,7 @@
                 frame(); // Initial call to display timer immediately
             }
 
-            socket.on('new_bid', function(data) {
+            socket.on('new_bid', function (data) {
                 const logContainer = document.getElementById("bids-log");
                 if (logContainer) {
                     const logEntry = document.createElement("div");
@@ -215,12 +221,22 @@
                 const lowestBidDiv = document.getElementById("lowest-bid");
                 if (lowestBidDiv) {
                     lowestBidDiv.innerHTML = "Lowest Current Bid: RM$" + formattedAmount;
-                } 
+                }
                 // else {
                 //     lowestBidDiv.innerHTML = "Lowest Current Bid: No bids yet";
                 // }
 
-                 // Update user rank
+
+                const maxBidElement = document.getElementById("max-bid");
+                if (maxBidElement && data.max_bid_amount !== undefined) {
+                    const formattedMax = parseFloat(data.max_bid_amount).toLocaleString('en-SG', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    maxBidElement.innerHTML = "RM$" + formattedMax;
+                }
+
+                // Update user rank
 
                 const userRankElement = document.getElementById("user-rank");
 
@@ -242,10 +258,10 @@
                 const MinBidAmount = document.getElementById("min-bid");
                 if (MinBidAmount) {
                     MinBidAmount.innerHTML = "RM$" + formattedAmount3;
-                } 
+                }
             });
 
-            socket.on('timer_extended', function(data) {
+            socket.on('timer_extended', function (data) {
                 const newEndTime = new Date(data.end_time);
                 updateTimer(newEndTime);
             });

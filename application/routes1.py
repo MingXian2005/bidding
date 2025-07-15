@@ -142,6 +142,12 @@ def bid():
     else:
         min_bid_amount = STARTING_PRICE - Decrement # or some fallback
 
+    # Get Max bid you could
+    if lowest_bid_amount is not None and lowest_bid_amount > 0:
+        max_bid_amount = lowest_bid_amount * 0.20
+    else:
+        max_bid_amount = STARTING_PRICE * 0.20
+
     # Subquery: get the latest bid timestamp for each user
     latest_bids_subq = (
         db.session.query(
@@ -184,6 +190,8 @@ def bid():
             flash('Your bid must be at least S$ 0.01.', 'danger')
         elif auction_end_time is None:
             flash('No active auction yet.', 'danger')
+        elif bid_value < max_bid_amount:
+            flash(f'Your bid must not exceed 20% of the lowest bid (S$ {max_bid_amount:.2f}).', 'danger')
         else:
             # Get force end time
             timer2 = Timer.query.order_by(Timer.id.desc()).first()
@@ -209,6 +217,12 @@ def bid():
             # 🔁 REFRESH lowest bid after bid is committed
             lowest_bid = db.session.query(Bid).order_by(Bid.amount.asc()).first()
             lowest_bid_amount = lowest_bid.amount if lowest_bid else None
+
+            # ✅ Recalculate max_bid_amount AFTER lowest_bid is refreshed
+            if lowest_bid_amount is not None and lowest_bid_amount > 0:
+                max_bid_amount = lowest_bid_amount * 0.20
+            else:
+                max_bid_amount = STARTING_PRICE * 0.20
 
             bids = Bid.query.order_by(asc(Bid.amount)).all()
             # Refresh latest_bid and user_rank after the new bid is saved
@@ -248,7 +262,8 @@ def bid():
                 'display_name': new_bid.user.display_name,
                 'user_rank': user_rank,
                 'user_id': current_user.id,
-                'min_bid_amount': min_bid_amount
+                'min_bid_amount': min_bid_amount,
+                'max_bid_amount': max_bid_amount
             })
 
             flash('Your bid has been placed successfully!', 'success')
@@ -318,6 +333,7 @@ def bid():
         decrement=Decrement,
         lowest_bidding = lowest_bid_amount,
         bids=bids,
+        max_bid_amount=max_bid_amount,
         desig_auc_strt_time=desig_auc_strt_time
     )
 
