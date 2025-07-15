@@ -125,7 +125,7 @@
         <div class="update-log">
             <h2>Updates Log</h2>
             <div id="bids-log">
-                {% for bid in bids %}
+                {% for bid in bids[:6] %}
                 <div class="log-entry">
                     {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}: 
                     User 
@@ -193,6 +193,11 @@
 
                     logEntry.innerText = `${data.timestamp}: User ${displayName} bidded RM$${formattedAmount4}`;
                     logContainer.prepend(logEntry);
+
+                    // Keep only the latest 6 log entries
+                    while (logContainer.children.length > 6) {
+                        logContainer.removeChild(logContainer.lastChild);
+                    }
                 }
 
                 var formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {
