@@ -1,5 +1,5 @@
 from application import app, db
-from application.models import Users, Timer, Initials
+from application.models import Users, Timer, Initials, Bid
 from flask_login import current_user, login_required
 from functools import wraps
 from flask import render_template, request, flash, redirect, url_for, abort
@@ -201,3 +201,20 @@ def admin_start():
         flash(f'Auction timer set.', 'success')
         return redirect(url_for('admin_start'))
     return render_template('admin_start.html', form=form, title="Admin Start")
+
+@app.route('/admin/rm', methods=['GET'])
+@login_required
+@admin_required
+def admin_rm():
+    bids = Bid.query.order_by(Bid.timestamp.desc()).all()
+    return render_template('admin_rm.html', bids=bids, title="Remove Bids")
+
+@app.route('/admin/rm/<int:bid_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_bid(bid_id):
+    bid = Bid.query.get_or_404(bid_id)
+    db.session.delete(bid)
+    db.session.commit()
+    flash(f'Bid {bid_id} has been deleted.', 'success')
+    return redirect(url_for('admin_rm'))
