@@ -181,7 +181,7 @@ def admin_start():
         start_time = form.start_time.data
         duration = form.duration.data
         extra_duration = form.extra_duration.data
-        total_extra_duration = extra_duration
+        total_extra_duration = extra_duration + duration
         start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         end_time = start_time + timedelta(minutes=duration)
         force_end_time = start_time + timedelta(minutes=total_extra_duration)

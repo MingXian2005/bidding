@@ -97,6 +97,8 @@ def bid():
 
     auction_over = False
     auction_end_time = None
+    print("auction_started: ")
+    print(auction_started)
 
     # Latest bid done by the user
     latest_bid = Bid.query.filter_by(user_id=current_user.id).order_by(Bid.timestamp.desc()).first()
