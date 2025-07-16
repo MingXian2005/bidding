@@ -185,7 +185,9 @@ def bid():
     if form.validate_on_submit() and auction_over == False:
         bid_value = form.amount.data
 
-        if bid_value >= STARTING_PRICE:
+        if auction_end_time is None:
+            flash('No active auction yet.', 'danger')
+        elif bid_value >= STARTING_PRICE:
             flash(f'Your bid must be LOWER than the starting price (S$ {STARTING_PRICE:.2f}).', 'danger')
         elif bid_value > STARTING_PRICE - Decrement: 
             flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
@@ -195,8 +197,6 @@ def bid():
             flash(f'Your bid must be LOWER than the minimum bid decrement (S$ {Decrement:.2f}).', 'danger')
         elif bid_value < 0.01:
             flash('Your bid must be at least S$ 0.01.', 'danger')
-        elif auction_end_time is None:
-            flash('No active auction yet.', 'danger')
         elif bid_value < max_bid_amount:
             flash(f'Your bid must not exceed 20% of the lowest bid (S$ {max_bid_amount:.2f}).', 'danger')
         else:
