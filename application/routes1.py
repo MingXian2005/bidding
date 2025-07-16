@@ -221,11 +221,11 @@ def bid():
             db.session.add(new_bid)
             db.session.commit()
 
-            # 🔁 REFRESH lowest bid after bid is committed
+            # REFRESH lowest bid after bid is committed
             lowest_bid = db.session.query(Bid).order_by(Bid.amount.asc()).first()
             lowest_bid_amount = lowest_bid.amount if lowest_bid else None
 
-            # ✅ Recalculate max_bid_amount AFTER lowest_bid is refreshed
+            # Recalculate max_bid_amount AFTER lowest_bid is refreshed
             if lowest_bid_amount is not None and lowest_bid_amount > 0:
                 max_bid_amount = lowest_bid_amount * 0.20
             else:

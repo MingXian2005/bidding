@@ -10,7 +10,7 @@ class RegistrationForm(FlaskForm):
 
 
 class BidForm(FlaskForm):
-    amount = FloatField('Bid Amount (RM$)', validators=[InputRequired(), NumberRange(min=0.01)])
+    amount = FloatField('Bid Amount (RM)', validators=[InputRequired(), NumberRange(min=0.01)])
     submit = SubmitField('Place Bid')
 
 

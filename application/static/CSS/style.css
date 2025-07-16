@@ -175,3 +175,13 @@ h1 {
 .update-log {
     padding-bottom: 30px;
 }
+
+#bid-btn {
+    width: 200px;
+    height: 30px;
+    font-size: 16px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
