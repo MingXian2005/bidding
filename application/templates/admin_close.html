@@ -22,13 +22,7 @@
                 <span style="color: red;">{{ error }}</span><br>
                 {% endfor %}
             </p>
-            <p>
-                {{ form.force_end_time.label }}<br>
-                {{ form.force_end_time(size=40) }}<br>
-                {% for error in form.force_end_time.errors %}
-                <span style="color: red;">{{ error }}</span><br>
-                {% endfor %}
-            </p>
+
             <p>{{ form.submit() }}</p>
         </form>
     </div>

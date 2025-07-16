@@ -113,10 +113,11 @@ def admin_page():
 def admin_start_auction():
     # You can get duration from a form or use a default
     duration = int(request.form.get('duration', 5))  # default 5 minutes if not provided
-    extra_duration = int(request.form.get('extra_duration', 5))  # default 5 minutes if not provided
-    total_extra_duration = extra_duration + duration
+    # extra_duration = int(request.form.get('extra_duration', 5))  # default 5 minutes if not provided
+    # total_extra_duration = extra_duration + duration
     end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=duration)
-    force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=total_extra_duration)
+    # force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=total_extra_duration)
+    force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=10000000)
     start_time = datetime.now(ZoneInfo("Asia/Singapore"))
     print("admin timer setting")
     print(end_time, 'end time')
@@ -127,7 +128,7 @@ def admin_start_auction():
     timer = Timer(end_time=end_time, force_end_time=force_end_time, start_time=start_time)
     db.session.add(timer)
     db.session.commit()
-    flash(f'Auction timer set for {duration} minutes and force ends after an additional {extra_duration}.', 'success')
+    flash(f'Auction timer set for {duration} minutes.', 'success')
     return redirect(url_for('admin_page'))
 
 @app.route('/admin/init', methods=['GET', 'POST'])
@@ -180,11 +181,12 @@ def admin_start():
     if form.validate_on_submit():
         start_time = form.start_time.data
         duration = form.duration.data
-        extra_duration = form.extra_duration.data
-        total_extra_duration = extra_duration + duration
+        # extra_duration = form.extra_duration.data
+        # total_extra_duration = extra_duration + duration
         start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         end_time = start_time + timedelta(minutes=duration)
-        force_end_time = start_time + timedelta(minutes=total_extra_duration)
+        # force_end_time = start_time + timedelta(minutes=total_extra_duration)
+        force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=10000000)
         print(start_time)
         print(end_time)
         print(force_end_time)
@@ -228,10 +230,11 @@ def admin_close():
     if form.validate_on_submit():
         start_time = form.start_time.data
         duration = form.duration.data
-        force_end_time = form.force_end_time.data
+        # force_end_time = form.force_end_time.data
         start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         end_time = start_time + timedelta(minutes=duration)
-        force_end_time = force_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        #force_end_time = force_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=10000000)
         print(start_time)
         print(end_time)
         print(force_end_time)
