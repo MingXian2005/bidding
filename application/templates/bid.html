@@ -63,6 +63,8 @@
             {% else %}
             {% if timer %}
             <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+            <span style="font-size: 35px">Force end at</span>
+            <span style="font-size: 35px"> {{ auction_force_end_time.strftime('%B %d, %Y at %I:%M %p') }} </span>
             {% endif %}
             {% endif %}
         </h1>
@@ -231,6 +233,7 @@
                     maxBidElement.innerHTML = "RM$" + formattedMax;
                 }
 
+                
                 // Update user rank
 
                 const userRankElement = document.getElementById("user-rank");

@@ -77,6 +77,7 @@ def bid():
     AUCTION_EXTENSION = 60
 
     auction_started = False
+    auction_force_end_time = None
     # Fetch latest timer
     timer = Timer.query.order_by(Timer.id.desc()).first()
     end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
@@ -336,7 +337,8 @@ def bid():
         lowest_bidding = lowest_bid_amount,
         bids=bids,
         max_bid_amount=max_bid_amount,
-        desig_auc_strt_time=desig_auc_strt_time
+        desig_auc_strt_time=desig_auc_strt_time,
+        auction_force_end_time=auction_force_end_time
     )
 
 ################################################################################################
