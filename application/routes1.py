@@ -70,7 +70,7 @@ def logout():
 @login_required
 def bid():
     if current_user.is_blocked:
-        return redirect(url_for('bidding'))
+        return redirect(url_for('blocked'))
     
     form = BidForm()
     now = datetime.now(ZoneInfo("Asia/Singapore"))
@@ -274,6 +274,7 @@ def bid():
             })
 
             flash('Your bid has been placed successfully!', 'success')
+            return redirect(url_for('bid'))
 
     elif form.is_submitted() and auction_over:
         flash('Bidding has ended. You cannot place a bid.', 'danger')
@@ -407,3 +408,8 @@ def reset():
     db.session.commit()
     flash('All bids and auction timer have been reset.', 'success')
     return redirect(url_for('bid'))
+
+##############################################################################################
+@app.route('/blocked')
+def blocked():
+    return render_template('blocked.html')
