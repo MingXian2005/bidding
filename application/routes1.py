@@ -361,10 +361,8 @@ def bidding():
     auction_over = False
     now = datetime.now(ZoneInfo("Asia/Singapore"))
 
-    if timer.end_time is not None:
+    if timer and timer.end_time is not None:
         auction_end_time = timer.end_time
-        # Ensure timezone awareness
-        # auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         auction_end_time = auction_end_time.replace(tzinfo=timezone.utc)
         auction_end_time = auction_end_time.astimezone(ZoneInfo("Asia/Singapore"))
         time_left = int((auction_end_time - now).total_seconds())
@@ -372,6 +370,8 @@ def bidding():
             auction_over = True
         else:
             auction_over = False
+    else:
+        auction_over = False  # or False, depending on your logic
 
     if auction_over == True:
         # end_time_iso = timer.end_time.isoformat() if timer and timer.end_time else None
