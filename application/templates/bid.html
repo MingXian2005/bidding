@@ -23,7 +23,9 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <h1> {% if not auction_started %}
+
+        <h1>
+            {% if not auction_started %}
             {% if desig_auc_strt_time %}
             Auction has not started. Auction will start on {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p')
             }}.<br>
@@ -32,25 +34,22 @@
             {% endif %}
             {% else %}
             {% if timer %}
-            <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-            <!-- <span style="font-size: 35px">Force end at</span>
-            <span style="font-size: 35px"> {{ auction_force_end_time.strftime('%B %d, %Y at %I:%M %p') }} </span> -->
+            <!-- Pass both start and end times as data attributes -->
+            <div id="timer" data-start-time="{{ timer.start_time.isoformat() if timer else '' }}"
+                data-end-time="{{ timer.end_time.isoformat() if timer else '' }}">
+            </div>
             {% endif %}
             {% endif %}
         </h1>
-        <div class="maindiv">
 
+        <div class="maindiv">
             <div>
                 <div class="class1">
-                    <img src="../static/uploads/project.jpeg" alt="roject.jpeg">
+                    <img src="../static/uploads/project.jpeg" alt="project.jpeg">
                 </div>
                 <div class="class1">
-                    <div class="Rside">Starting Price: RM{{ "{:,.2f}".format(starting_price)
-                        or "0.00" }}
-                    </div>
-                    <div class="Rside">Min Lot Decrement: RM{{ "{:,.2f}".format(decrement) or
-                        "0.00" }}
-                    </div>
+                    <div class="Rside">Starting Price: RM{{ "{:,.2f}".format(starting_price) or "0.00" }}</div>
+                    <div class="Rside">Min Lot Decrement: RM{{ "{:,.2f}".format(decrement) or "0.00" }}</div>
 
                     {% if latest_bid %}
                     <div class="Rside latestbid">
@@ -60,7 +59,7 @@
                             {% if user_rank == 1 %}
                             👑 (You are the lowest)
                             {% else %}
-                            &nbsp; <!-- placeholder to ensure the div renders -->
+                            &nbsp; <!-- placeholder -->
                             {% endif %}
                         </span>
                     </div>
@@ -69,6 +68,7 @@
                         <strong>No latest bid done by you yet.</strong>
                     </div>
                     {% endif %}
+
                     <div class="Rside lowestbid" id="lowest-bid">
                         Lowest Current Bid:
                         {% if lowest_bidding %}
@@ -77,12 +77,13 @@
                         No bids yet
                         {% endif %}
                     </div>
-                    <form method="POST" action="{{ url_for('bid') }}" class="">
+
+                    <form method="POST" action="{{ url_for('bid') }}">
                         {{ form.hidden_tag() }}
                         <p>
                             {{ form.amount.label }}. You need to bid between:<br>
-                            Max: <span id="min-bid">RM{{ "{:,.2f}".format(min_bid_amount) }}</span>
-                            - Min: <span id="max-bid">RM{{ "{:,.2f}".format(max_bid_amount) }}</span><br>
+                            Max: <span id="min-bid">RM{{ "{:,.2f}".format(min_bid_amount) }}</span> -
+                            Min: <span id="max-bid">RM{{ "{:,.2f}".format(max_bid_amount) }}</span><br>
                             {{ form.amount(style="margin-top: 30px; width:300px; height:40px; font-size:20px;") }}<br>
                             {% for error in form.amount.errors %}
                             <span style="color: red;">{{ error }}</span><br>
@@ -114,9 +115,11 @@
             </div>
         </div>
     </div>
+
     <script>
-        const CURRENT_USER_ID = {{ current_user.id }}; // Ignore the syntax error
+        const CURRENT_USER_ID = {{ current_user.id }};
     </script>
+
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         function confirmBid() {
@@ -124,39 +127,68 @@
             return confirm(`Are you sure you want to place this bid of RM${amount}?`);
         }
 
-        document.addEventListener('DOMContentLoaded', (event) => {
+        document.addEventListener('DOMContentLoaded', () => {
             const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
             const timerElement = document.getElementById('timer');
             let timerInterval;
 
-            function updateTimer(endTime) {
+            function formatTime(ms) {
+                const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+                return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+
+            function updateTimer(startTime, endTime) {
                 if (timerInterval) {
                     clearInterval(timerInterval);
                 }
 
                 function frame() {
                     const now = new Date();
-                    const timeLeft = endTime - now;
 
-                    if (timeLeft < 0) {
+                    if (now < startTime) {
+                        // Before auction start — countdown to start
+                        const timeToStart = startTime - now;
+                        timerElement.innerHTML = `Auction starts in: ${formatTimeDiff(timeToStart)}`;
+                    } else if (now >= startTime && now < endTime) {
+                        // Auction live — countdown to end
+                        const timeLeft = endTime - now;
+                        timerElement.innerHTML = `Time left: ${formatTimeDiff(timeLeft)}`;
+                    } else {
+                        // Auction ended
                         timerElement.innerHTML = "Bidding has ended!";
                         clearInterval(timerInterval);
-                        return;
                     }
+                }
 
-                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                    timerElement.innerHTML = `Time left: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+                function formatTimeDiff(ms) {
+                    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+                    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
                 }
 
                 timerInterval = setInterval(frame, 1000);
-                frame(); // Initial call to display timer immediately
+                frame();
             }
 
-            socket.on('new_bid', function (data) {
+            socket.on('refresh_page', () => {
+                console.log('Refreshing page immediately after timer set');
+                window.location.reload();
+            });
+            
+            socket.on('auction_started', (data) => {
+                console.log(data.message);
+                // Option 1: Update timer UI to show auction started
+                // Option 2: Refresh page
+                window.location.reload();
+            });
+
+            // Update bids and UI on new bid event
+            socket.on('new_bid', (data) => {
                 const logContainer = document.getElementById("bids-log");
                 if (logContainer) {
                     const logEntry = document.createElement("div");
@@ -167,34 +199,25 @@
                         maximumFractionDigits: 2
                     });
 
-                    // Use display_name if it's your own bid
                     let displayName = (data.user_id === CURRENT_USER_ID) ? data.display_name : data.IdentificationKey;
 
                     logEntry.innerText = `${data.timestamp}: User ${displayName} bidded RM${formattedAmount4}`;
                     logContainer.prepend(logEntry);
 
-                    // Keep only the latest 6 log entries
                     while (logContainer.children.length > 6) {
                         logContainer.removeChild(logContainer.lastChild);
                     }
                 }
 
-                var formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {
+                const formattedAmount = parseFloat(data.amount).toLocaleString('en-SG', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
                 });
 
-
-
-                // Update Lowest Current Bid
                 const lowestBidDiv = document.getElementById("lowest-bid");
                 if (lowestBidDiv) {
                     lowestBidDiv.innerHTML = "Lowest Current Bid: RM" + formattedAmount;
                 }
-                // else {
-                //     lowestBidDiv.innerHTML = "Lowest Current Bid: No bids yet";
-                // }
-
 
                 const maxBidElement = document.getElementById("max-bid");
                 if (maxBidElement && data.max_bid_amount !== undefined) {
@@ -205,17 +228,12 @@
                     maxBidElement.innerHTML = "RM" + formattedMax;
                 }
 
-
-                // Update user rank
-
                 const userRankElement = document.getElementById("user-rank");
-
-                // 👑 Update crown dynamically based on YOUR current rank
                 if (userRankElement) {
                     if (data.user_id === CURRENT_USER_ID && data.user_rank === 1) {
                         userRankElement.innerHTML = "👑 (You are the lowest)";
                     } else {
-                        userRankElement.innerHTML = "&nbsp;"; // remove crown if not lowest anymore
+                        userRankElement.innerHTML = "&nbsp;";
                     }
                 }
 
@@ -224,21 +242,30 @@
                     maximumFractionDigits: 2
                 });
 
-                // Update Lowest Current Bid
-                const MinBidAmount = document.getElementById("min-bid");
-                if (MinBidAmount) {
-                    MinBidAmount.innerHTML = "RM" + formattedAmount3;
+                const minBidAmount = document.getElementById("min-bid");
+                if (minBidAmount) {
+                    minBidAmount.innerHTML = "RM" + formattedAmount3;
                 }
             });
 
-            socket.on('timer_extended', function (data) {
-                const newEndTime = new Date(data.end_time);
-                updateTimer(newEndTime);
+            // Listen for timer updates from admin
+            socket.on('timer_updated', (data) => {
+                const startTime = new Date(data.start_time + "Z");
+                const endTime = new Date(data.end_time + "Z");
+
+                if (timerElement) {
+                    timerElement.dataset.startTime = data.start_time;
+                    timerElement.dataset.endTime = data.end_time;
+                }
+
+                updateTimer(startTime, endTime);
             });
 
-            if (timerElement && timerElement.dataset.endTime) {
-                const initialEndTime = new Date(timerElement.dataset.endTime + "Z");
-                updateTimer(initialEndTime);
+            // Initialize timer on page load if data exists
+            if (timerElement && timerElement.dataset.startTime && timerElement.dataset.endTime) {
+                const startTime = new Date(timerElement.dataset.startTime + "Z");
+                const endTime = new Date(timerElement.dataset.endTime + "Z");
+                updateTimer(startTime, endTime);
             }
         });
     </script>

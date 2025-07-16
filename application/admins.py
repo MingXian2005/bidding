@@ -1,4 +1,4 @@
-from application import app, db
+from application import app, db, socketio
 from application.models import Users, Timer, Initials, Bid
 from flask_login import current_user, login_required
 from functools import wraps
@@ -6,7 +6,10 @@ from flask import render_template, request, flash, redirect, url_for, abort
 from application.forms import RegistrationForm, TimerForm, InitialsForm, NewTimerForm, NewTimerForm2
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+from apscheduler.schedulers.background import BackgroundScheduler
 
+scheduler = BackgroundScheduler()
+scheduler.start()
 
 def admin_required(f):
     @wraps(f)
@@ -222,6 +225,10 @@ def delete_bid(bid_id):
     return redirect(url_for('admin_rm'))
 
 
+def emit_auction_start():
+    print("Auction start time reached! Emitting event to clients.")
+    socketio.emit('auction_started', {'message': 'Auction has started!'})
+
 @app.route('/admin/close', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -230,24 +237,37 @@ def admin_close():
     if form.validate_on_submit():
         start_time = form.start_time.data
         duration = form.duration.data
-        # force_end_time = form.force_end_time.data
         start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         end_time = start_time + timedelta(minutes=duration)
-        #force_end_time = force_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
         force_end_time = datetime.now(ZoneInfo("Asia/Singapore")) + timedelta(minutes=10000000)
-        print(start_time)
-        print(end_time)
-        print(force_end_time)
-        print(datetime.now(ZoneInfo("Asia/Singapore")))
 
-
-        # Remove old timers
         Timer.query.delete()
         db.session.commit()
 
         timer = Timer(start_time=start_time, end_time=end_time, force_end_time=force_end_time)
         db.session.add(timer)
         db.session.commit()
+
+        # Emit timer update immediately to refresh clients after setting time
+        socketio.emit('timer_updated', {
+            'start_time': timer.start_time.isoformat(),
+            'end_time': timer.end_time.isoformat()
+        })
+
+        # Also emit a 'refresh_page' event so clients can reload immediately
+        socketio.emit('refresh_page', {})
+
+        # Clear existing scheduled jobs
+        scheduler.remove_all_jobs()
+
+        # Schedule auction start event
+        scheduler.add_job(
+            func=emit_auction_start,
+            trigger='date',
+            run_date=start_time.astimezone(ZoneInfo("UTC")),
+            id='auction_start_job'
+        )
+
         flash(f'Auction timer set.', 'success')
         return redirect(url_for('admin_close'))
     return render_template('admin_close.html', form=form, title="Admin Close")
