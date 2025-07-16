@@ -34,6 +34,12 @@ class NewTimerForm(FlaskForm):
     extra_duration = IntegerField('Extra Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
     submit = SubmitField('Set Timer')
 
+class NewTimerForm2(FlaskForm):
+    start_time = DateTimeField('Start Time', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()], render_kw={"placeholder": "%Y-%m-%d %H:%M:%S, 24hrs"})
+    duration = IntegerField('Auction Duration (minutes)', validators=[InputRequired(), NumberRange(min=1)])
+    force_end_time = DateTimeField('Start Time', format='%Y-%m-%d %H:%M:%S', validators=[InputRequired()], render_kw={"placeholder": "%Y-%m-%d %H:%M:%S, 24hrs"})
+    submit = SubmitField('Set Timer')
+
 
 
 class InitialsForm(FlaskForm):

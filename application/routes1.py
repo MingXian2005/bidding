@@ -106,6 +106,9 @@ def bid():
 
     if auction_started == True:
         if timer.end_time is not None:
+            auction_force_end_time =timer.force_end_time
+            auction_force_end_time = auction_force_end_time.replace(tzinfo=timezone.utc)
+            auction_force_end_time = auction_force_end_time.astimezone(ZoneInfo("Asia/Singapore"))
             auction_end_time = timer.end_time
             # Ensure timezone awareness
             # auction_end_time = auction_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
@@ -123,6 +126,7 @@ def bid():
         time_left = 0  # default if no timer exists
 
     print(auction_end_time, "auction_end_time, 1")
+    print(auction_force_end_time, "auction_end_time, 1")
     print(now, "now, 1")
     print(time_left, "time_left, 1")
 

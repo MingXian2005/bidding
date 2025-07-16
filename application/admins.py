@@ -3,7 +3,7 @@ from application.models import Users, Timer, Initials, Bid
 from flask_login import current_user, login_required
 from functools import wraps
 from flask import render_template, request, flash, redirect, url_for, abort
-from application.forms import RegistrationForm, TimerForm, InitialsForm, NewTimerForm
+from application.forms import RegistrationForm, TimerForm, InitialsForm, NewTimerForm, NewTimerForm2
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -218,3 +218,33 @@ def delete_bid(bid_id):
     db.session.commit()
     flash(f'Bid {bid_id} has been deleted.', 'success')
     return redirect(url_for('admin_rm'))
+
+
+@app.route('/admin/close', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_close():
+    form = NewTimerForm2()
+    if form.validate_on_submit():
+        start_time = form.start_time.data
+        duration = form.duration.data
+        force_end_time = form.force_end_time.data
+        start_time = start_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        end_time = start_time + timedelta(minutes=duration)
+        force_end_time = force_end_time.replace(tzinfo=ZoneInfo("Asia/Singapore"))
+        print(start_time)
+        print(end_time)
+        print(force_end_time)
+        print(datetime.now(ZoneInfo("Asia/Singapore")))
+
+
+        # Remove old timers
+        Timer.query.delete()
+        db.session.commit()
+
+        timer = Timer(start_time=start_time, end_time=end_time, force_end_time=force_end_time)
+        db.session.add(timer)
+        db.session.commit()
+        flash(f'Auction timer set.', 'success')
+        return redirect(url_for('admin_close'))
+    return render_template('admin_close.html', form=form, title="Admin Close")
