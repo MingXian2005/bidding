@@ -53,19 +53,21 @@
         {% endfor %}
         {% endif %}
         {% endwith %}
-        <h1> {% if not auction_started %}
+        <h1 id="auction-status"
             {% if desig_auc_strt_time %}
-            Auction has not started. Auction will start on {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p')
-            }}.<br>
+                data-start-time="{{ desig_auc_strt_time.isoformat() }}"
+            {% endif %}>
+            {% if not auction_started %}
+                {% if desig_auc_strt_time %}
+                    Auction has not started. Auction will start on
+                    {{ desig_auc_strt_time.strftime('%B %d, %Y at %I:%M %p') }}.
+                {% else %}
+                    Auction has not started. Auction start time not set.
+                {% endif %}
             {% else %}
-            Auction has not started. Auction start time not set.<br>
-            {% endif %}
-            {% else %}
-            {% if timer %}
-            <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
-            <!-- <span style="font-size: 35px">Force end at</span>
-            <span style="font-size: 35px"> {{ auction_force_end_time.strftime('%B %d, %Y at %I:%M %p') }} </span> -->
-            {% endif %}
+                {% if timer %}
+                    <div id="timer" data-end-time="{{ timer.end_time.isoformat() }}"></div>
+                {% endif %}
             {% endif %}
         </h1>
         <div class="maindiv">
@@ -272,6 +274,19 @@
             }
         });
     </script>
+    {% if not auction_started and desig_auc_strt_time %}
+    <script>
+        const startTime = new Date("{{ desig_auc_strt_time.isoformat() }}");
+
+        const checkInterval = setInterval(() => {
+            const now = new Date();
+            if (now >= startTime) {
+                clearInterval(checkInterval);
+                location.reload(); // 🔄 Refresh ONCE when it's time
+            }
+        }, 1000);
+    </script>
+    {% endif %}
 </body>
 
 </html>
