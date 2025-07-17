@@ -4,7 +4,30 @@
 <head>
     <title>Place a Bid</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+    <style>
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 3px;
+            background-color: #f9f9f9;
+        }
 
+        .new-log-entry {
+            animation: slide-in 0.5s ease-out forwards;
+        }
+
+        @keyframes slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
     <!-- <style>
         .bid-container {
             display: flex;
@@ -133,7 +156,7 @@
             <div id="bids-log">
                 {% for bid in bids[:6] %}
                 <div class="log-entry">
-                    {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:
+                    {{ bid.timestamp.strftime('%d/%m/%Y, %H:%M:%S') }}:
                     User
                     {% if bid.user.id == current_user.id %}
                     {{ current_user.display_name }}
@@ -192,7 +215,7 @@
                 const logContainer = document.getElementById("bids-log");
                 if (logContainer) {
                     const logEntry = document.createElement("div");
-                    logEntry.className = "log-entry";
+                    logEntry.className = "log-entry new-log-entry";
 
                     const formattedAmount4 = parseFloat(data.amount).toLocaleString('en-SG', {
                         minimumFractionDigits: 2,
@@ -202,8 +225,25 @@
                     // Use display_name if it's your own bid
                     let displayName = (data.user_id === CURRENT_USER_ID) ? data.display_name : data.IdentificationKey;
 
-                    logEntry.innerText = `${data.timestamp}: User ${displayName} bidded RM${formattedAmount4}`;
+                    const sgTime = new Date(data.timestamp).toLocaleString('en-SG', {
+                        timeZone: 'Asia/Singapore',
+                        hour12: false,
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                    });
+
+                    logEntry.innerText = `${sgTime}: User ${displayName} bidded RM${formattedAmount4}`;
+
                     logContainer.prepend(logEntry);
+
+                    // Remove the animation class after it has played
+                    setTimeout(() => {
+                        logEntry.classList.remove('new-log-entry');
+                    }, 500); // Match the animation duration
 
                     // Keep only the latest 6 log entries
                     while (logContainer.children.length > 6) {

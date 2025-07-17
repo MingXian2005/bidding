@@ -261,11 +261,26 @@ def bid():
             else:
                 min_bid_amount = STARTING_PRICE - Decrement # or some fallback
 
+            # timeStamp=new_bid.timestamp
+            # timeStamp = timeStamp.replace(tzinfo=timezone.utc)
+            # timeStamp = timeStamp.astimezone(ZoneInfo("Asia/Singapore"))
+
+            # UTC-aware timestamp from database
+            utc_time = new_bid.timestamp  # Already has tzinfo=UTC
+
+            # Convert to Singapore time directly
+            sg_time = utc_time.astimezone(ZoneInfo("Asia/Singapore"))
+            formatted_time = sg_time.strftime('%Y-%m-%d %H:%M:%S %z')
+            print("Raw timestamp:", new_bid.timestamp)
+            print("tzinfo:", new_bid.timestamp.tzinfo)
+            print("formatted_time:", formatted_time)
+
+
             # Emit real-time update
             socketio.emit('new_bid', {
                 'IdentificationKey': new_bid.user.IdentificationKey,
                 'amount': new_bid.amount,
-                'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'timestamp': formatted_time,
                 'display_name': new_bid.user.display_name,
                 'user_rank': user_rank,
                 'user_id': current_user.id,
@@ -324,6 +339,10 @@ def bid():
     else:
         print("desig_auc_strt_time: ")
         print(desig_auc_strt_time)
+
+    for bid in bids:
+        bid.timestamp = bid.timestamp.replace(tzinfo=timezone.utc)
+        bid.timestamp = bid.timestamp.astimezone(ZoneInfo("Asia/Singapore"))
     
     return render_template(
         'bid.html',
