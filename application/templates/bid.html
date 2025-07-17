@@ -179,6 +179,22 @@
             return confirm(`Are you sure you want to place this bid of RM${amount}?`);
         }
 
+        function animateLogEntriesOnLoad() {
+            const entries = document.querySelectorAll('#bids-log .log-entry');
+
+            entries.forEach((entry, index) => {
+                // Optional staggered effect (e.g., 100ms between entries)
+                setTimeout(() => {
+                    entry.classList.add('new-log-entry');
+
+                    // Remove class after animation completes
+                    setTimeout(() => {
+                        entry.classList.remove('new-log-entry');
+                    }, 500); // Duration matches @keyframes slide-in
+                }, index * 100);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', (event) => {
             const socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
             const timerElement = document.getElementById('timer');
@@ -312,6 +328,8 @@
                 const initialEndTime = new Date(timerElement.dataset.endTime + "Z");
                 updateTimer(initialEndTime);
             }
+
+            animateLogEntriesOnLoad();
         });
     </script>
     {% if not auction_started and desig_auc_strt_time %}
