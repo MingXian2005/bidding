@@ -102,7 +102,7 @@
             <div id="bids-log">
                 {% for bid in bids[:6] %}
                 <div class="log-entry">
-                    {{ bid.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}:
+                    {{ bid.timestamp_sg.strftime('%Y-%m-%d %H:%M:%S') }}:
                     User
                     {% if bid.user.id == current_user.id %}
                     {{ current_user.display_name }}

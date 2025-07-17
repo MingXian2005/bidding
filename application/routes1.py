@@ -255,17 +255,32 @@ def bid():
             ranking = {bid.user_id: idx for idx, bid in enumerate(latest_bids, start=1)}
             user_rank = ranking.get(current_user.id)
 
+            ###################################################################################
+            # Convert new_bid.timestamp to timezone-aware UTC if naive
+            timestamp_utc = new_bid.timestamp
+            if timestamp_utc.tzinfo is None:
+                timestamp_utc = timestamp_utc.replace(tzinfo=timezone.utc)
+
+            # Convert to Singapore timezone
+            timestamp_sg = timestamp_utc.astimezone(ZoneInfo("Asia/Singapore"))
+
+            # Format as string for emitting
+            formatted_timestamp = timestamp_sg.strftime('%Y-%m-%d %H:%M:%S')
+            ####################################################################################
+
             # Get the value you to add into form
             if new_bid.amount is not None and new_bid.amount > 0:
                 min_bid_amount = new_bid.amount - Decrement
             else:
                 min_bid_amount = STARTING_PRICE - Decrement # or some fallback
 
+            
+
             # Emit real-time update
             socketio.emit('new_bid', {
                 'IdentificationKey': new_bid.user.IdentificationKey,
                 'amount': new_bid.amount,
-                'timestamp': new_bid.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'timestamp': formatted_timestamp,
                 'display_name': new_bid.user.display_name,
                 'user_rank': user_rank,
                 'user_id': current_user.id,
@@ -299,6 +314,12 @@ def bid():
     bids = Bid.query.order_by(asc(Bid.amount)).all()
     # Refresh latest_bid and user_rank after the new bid is saved
     latest_bid = Bid.query.filter_by(user_id=current_user.id).order_by(Bid.timestamp.desc()).first()
+
+    for bid in bids:
+        ts = bid.timestamp
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        bid.timestamp_sg = ts.astimezone(ZoneInfo("Asia/Singapore"))
 
     # Rebuild ranking dict if needed
     latest_bids_subq = (
