@@ -55,7 +55,7 @@
                     <div class="Rside latestbid">
                         <strong>Your Latest Bid:</strong>
                         RM{{ "{:,.2f}".format(latest_bid.amount) }}
-                        <span class="close" id="user-rank">
+                        <span class="close" id="user-rank" style="color: {{ 'green' if user_rank == 1 else 'red' }};">
                             {% if user_rank == 1 %}
                             👑 (You are the lowest)
                             {% else %}
@@ -65,11 +65,12 @@
                     </div>
                     {% else %}
                     <div class="Rside latestbid Rside">
-                        <strong>No latest bid done by you yet.</strong>
+                        No latest bid done by you yet.
                     </div>
                     {% endif %}
 
-                    <div class="Rside lowestbid" id="lowest-bid">
+                    <div class="Rside lowestbid" id="lowest-bid"
+                        style="color: {{ 'green' if user_rank == 1 else 'red' }};">
                         Lowest Current Bid:
                         {% if lowest_bidding %}
                         RM{{ "{:,.2f}".format(lowest_bidding) }}
@@ -179,7 +180,7 @@
                 console.log('Refreshing page immediately after timer set');
                 window.location.reload();
             });
-            
+
             socket.on('auction_started', (data) => {
                 console.log(data.message);
                 // Option 1: Update timer UI to show auction started
@@ -217,6 +218,11 @@
                 const lowestBidDiv = document.getElementById("lowest-bid");
                 if (lowestBidDiv) {
                     lowestBidDiv.innerHTML = "Lowest Current Bid: RM" + formattedAmount;
+                    if (data.user_id === CURRENT_USER_ID && data.user_rank === 1) {
+                        lowestBidDiv.style.color = 'green';
+                    } else {
+                        lowestBidDiv.style.color = 'red';
+                    }
                 }
 
                 const maxBidElement = document.getElementById("max-bid");
