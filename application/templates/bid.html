@@ -179,8 +179,12 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         function confirmBid() {
-            const amount = document.getElementById("amount").value;
-            return confirm(`Are you sure you want to place this bid of RM${amount}?`);
+            const amount = parseFloat(document.getElementById("amount").value);
+            const formatted = amount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return confirm(`Are you sure you want to place this bid of RM${formatted}?`);
         }
 
         function animateLogEntriesOnLoad() {

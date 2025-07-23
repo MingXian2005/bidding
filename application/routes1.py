@@ -288,7 +288,7 @@ def bid():
                 'max_bid_amount': max_bid_amount
             })
 
-            flash('Your bid has been placed successfully!', 'success')
+            # flash('Your bid has been placed successfully!', 'success')
             return redirect(url_for('bid'))
 
     elif form.is_submitted() and auction_over:
