@@ -138,7 +138,7 @@
                             {{ form.amount.label }}. You need to bid between:<br>
                             Max: <span id="min-bid">RM{{ "{:,.2f}".format(min_bid_amount) }}</span>
                             - Min: <span id="max-bid">RM{{ "{:,.2f}".format(max_bid_amount) }}</span><br>
-                            {{ form.amount(style="margin-top: 30px; width:300px; height:40px; font-size:20px;") }}<br>
+                            {{ form.amount(style="margin-top: 30px; width:200px; height:40px; font-size:20px;") }}<br>
                             {% for error in form.amount.errors %}
                             <span style="color: red;">{{ error }}</span><br>
                             {% endfor %}
