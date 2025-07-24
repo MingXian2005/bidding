@@ -30,7 +30,7 @@ def index():
     if current_user.is_authenticated:
         return redirect(url_for('bid'))
     loginform = LoginForm()
-    return render_template('login.html', form=loginform, title="Authentication")
+    return render_template('login.html', form=loginform, title="Login Page")
 
 ################################################################################################
 #auth / login
@@ -49,7 +49,7 @@ def auth():
             return redirect(url_for('bid'))
         else:
             flash('Invalid Identification Key or password.', 'danger')
-    return render_template('login.html', form=loginform, title="Authentication")
+    return render_template('login.html', form=loginform, title="Login Page")
 
 ################################################################################################
 #logout
