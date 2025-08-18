@@ -142,7 +142,7 @@
                             {{ form.amount.label }}. You need to bid between:<br>
                             Max: <span id="min-bid">RM{{ "{:,.2f}".format(min_bid_amount) }}</span>
                             - Min: <span id="max-bid">RM{{ "{:,.2f}".format(max_bid_amount) }}</span><br>
-                            {{ form.amount(style="margin-top: 30px; width:200px; height:40px; font-size:20px;") }}<br>
+                            {{ form.amount(id="amount-input", style="margin-top: 30px; width:200px; height:40px; font-size:20px;") }}<br>
                             {% for error in form.amount.errors %}
                             <span style="color: red;">{{ error }}</span><br>
                             {% endfor %}
@@ -338,6 +338,25 @@
             }
 
             animateLogEntriesOnLoad();
+
+            const input = document.getElementById("amount-input");
+
+            input.addEventListener("input", function(e) {
+                // Remove anything that's not a digit
+                let value = this.value.replace(/,/g, "").replace(/[^\d]/g, "");
+
+                if (value) {
+                    // Format with commas
+                    this.value = Number(value).toLocaleString("en-US");
+                } else {
+                    this.value = "";
+                }
+            });
+
+            // On form submit, strip commas so backend gets a clean number
+            input.form.addEventListener("submit", function() {
+                input.value = input.value.replace(/,/g, "");
+            });
         });
     </script>
     {% if not auction_started and desig_auc_strt_time %}
