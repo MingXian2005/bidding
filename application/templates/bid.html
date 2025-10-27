@@ -179,7 +179,7 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
         function confirmBid() {
-            const amount = parseFloat(document.getElementById("amount").value);
+            const amount = parseFloat(document.getElementById("amount-input").value.replace(/,/g, ""));
             const formatted = amount.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
